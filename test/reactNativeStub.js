@@ -4,6 +4,7 @@
 const state = {
   width: 375,
   height: 812,
+  fontScale: 1,
   platform: 'ios',
   listeners: [],
   // RN >= 0.72 removed Dimensions.removeEventListener entirely.
@@ -40,12 +41,17 @@ module.exports = {
   Dimensions,
   PixelRatio: {
     roundToNearestPixel: (n) => Math.round(n * 2) / 2,
-    getFontScale: () => 1,
+    getFontScale: () => state.fontScale,
   },
   Platform: {
     get OS() {
       return state.platform;
     },
   },
-  useWindowDimensions: () => ({ width: state.width, height: state.height }),
+  useWindowDimensions: () => ({
+    width: state.width,
+    height: state.height,
+    scale: 2,
+    fontScale: state.fontScale,
+  }),
 };

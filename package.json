@@ -1,18 +1,21 @@
 {
   "name": "react-native-responsive-hook",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "license": "MIT",
   "description": "Make React Native views responsive for all devices with the use of 2 simple methods.",
-  "main": "index.js",
+  "main": "./lib/commonjs/index.js",
   "files": [
-    "index.js",
-    "useResponsiveScreen.js",
-    "constants.js",
-    "index.d.ts",
-    "index.js.flow"
+    "src",
+    "lib",
+    "!**/__tests__",
+    "!**/*.test.ts",
+    "!**/*.test.tsx"
   ],
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "typecheck": "tsc --noEmit",
+    "build": "bob build",
+    "prepare": "bob build"
   },
   "repository": {
     "type": "git",
@@ -20,27 +23,75 @@
   },
   "keywords": [
     "react-native",
+    "responsive",
     "responsive-ui",
-    "responsive-view",
-    "responsive-screen",
-    "responsive"
+    "responsive-design",
+    "breakpoints",
+    "hooks",
+    "useResponsive",
+    "font-scaling",
+    "accessibility",
+    "expo"
   ],
   "homepage": "https://github.com/mz-real/react-native-responsive-hook.git#readme",
   "peerDependencies": {
-    "react-native": ">=0.35"
+    "react": ">=16.8.0",
+    "react-native": ">=0.61"
   },
-  "types": "./index.d.ts",
+  "types": "./lib/typescript/commonjs/index.d.ts",
   "bugs": {
     "url": "https://github.com/mz-real/react-native-responsive-hook/issues"
-  },
-  "directories": {
-    "example": "examples"
   },
   "author": "Muhammad Zakria",
   "devDependencies": {
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
+    "@babel/preset-react": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@testing-library/react-native": "^12.9.0",
+    "@types/jest": "^29.5.14",
+    "@types/react": "^18.3.31",
     "babel-jest": "^29.7.0",
-    "jest": "^29.7.0"
+    "jest": "^29.7.0",
+    "react": "^18.3.1",
+    "react-native": "^0.76.9",
+    "react-native-builder-bob": "^0.40.18",
+    "react-test-renderer": "^18.3.1",
+    "typescript": "^5.9.3"
+  },
+  "module": "./lib/module/index.js",
+  "source": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./lib/typescript/module/index.d.ts",
+        "default": "./lib/module/index.js"
+      },
+      "require": {
+        "types": "./lib/typescript/commonjs/index.d.ts",
+        "default": "./lib/commonjs/index.js"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      [
+        "commonjs",
+        {
+          "esm": true
+        }
+      ],
+      [
+        "module",
+        {
+          "esm": true
+        }
+      ],
+      "typescript"
+    ]
   }
 }
