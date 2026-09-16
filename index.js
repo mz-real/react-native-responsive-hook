@@ -9,8 +9,6 @@ let screenWidth = Dimensions.get('window').width;
 // Retrieve initial screen's height
 let screenHeight = Dimensions.get('window').height;
 
-const base = isLandscape ? screenHeight : screenWidth;
-
 /**
  * Determines if the platform is iOS.
  * @type {boolean}
@@ -34,6 +32,12 @@ const isLandscape = screenWidth > screenHeight;
  * @type {boolean}
  */
 const isPortrait = screenWidth < screenHeight;
+
+/**
+ * The shorter screen edge, used as the baseline for font scaling.
+ * @type {number}
+ */
+const base = isLandscape ? screenHeight : screenWidth;
 
 /**
  * Converts provided width percentage to independent pixel (dp).
@@ -65,6 +69,9 @@ const heightPercentageToDP = heightPercent => {
   return PixelRatio.roundToNearestPixel(screenHeight * elemHeight / 100);
 };
 
+let orientationSubscription = null;
+let orientationHandler = null;
+
 /**
  * Event listener function that detects orientation change (every time it occurs) and triggers
  * screen rerendering. It does that, by changing the state of the screen where the function is
@@ -75,7 +82,7 @@ const heightPercentageToDP = heightPercent => {
  *                      invoke setState method and trigger screen rerender (this.setState()).
  */
 const listenOrientationChange = that => {
-  Dimensions.addEventListener('change', newDimensions => {
+  orientationHandler = newDimensions => {
     // Retrieve and save new dimensions
     screenWidth = newDimensions.window.width;
     screenHeight = newDimensions.window.height;
@@ -84,7 +91,9 @@ const listenOrientationChange = that => {
     that.setState({
       orientation: screenWidth < screenHeight ? 'portrait' : 'landscape'
     });
-  });
+  };
+
+  orientationSubscription = Dimensions.addEventListener('change', orientationHandler);
 };
 
 /**
@@ -94,7 +103,16 @@ const listenOrientationChange = that => {
  * avoid adding new listeners every time the same component is re-mounted.
  */
 const removeOrientationListener = () => {
-  Dimensions.removeEventListener('change', () => {});
+  // React Native >= 0.65 returns a subscription; >= 0.72 dropped
+  // Dimensions.removeEventListener entirely.
+  if (orientationSubscription && typeof orientationSubscription.remove === 'function') {
+    orientationSubscription.remove();
+  } else if (orientationHandler && typeof Dimensions.removeEventListener === 'function') {
+    Dimensions.removeEventListener('change', orientationHandler);
+  }
+
+  orientationSubscription = null;
+  orientationHandler = null;
 };
 
 /**
