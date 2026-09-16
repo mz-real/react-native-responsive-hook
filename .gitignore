@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+lib/
+*.tgz
+
+# Local design notes, not published
+docs/superpowers/

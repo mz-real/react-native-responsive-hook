@@ -18,8 +18,8 @@ const App = () => {
 
 // Define the useStyles hook
 const useStyles = () => {
-  const { isLandscape, isPortrait, wp, hp, breakpointGroup } = useResponsive(); // Destructure all properties from useResponsive
-  
+  const { isLandscape, isPortrait, wp, hp, fontSize, select } = useResponsive();
+
   // Utilize the hook values to create dynamic styles
   const styles = StyleSheet.create({
     container: {
@@ -35,26 +35,25 @@ const useStyles = () => {
       justifyContent: 'space-around',
       width: isPortrait ? wp(85) : wp(50),  // Adjust width based on orientation
       height: hp(17),                       // Adjust height using hp function
-      backgroundColor: getBackgroundColorByGroup(breakpointGroup) // Change box color based on breakpoint group
+      // select() picks a value for the current breakpoint, cascading down
+      // to the nearest smaller one that is defined.
+      backgroundColor: select({
+        xs: 'lightgreen',
+        sm: 'lightpink',
+        md: 'lightyellow',
+        lg: 'lightcoral',
+        xl: 'lightskyblue',
+        xxl: 'lightsteelblue',
+      }),
+      padding: select({ xs: 8, md: 16, xl: 32 }),
     },
     text: {
       color: 'white',
+      fontSize: fontSize(16), // Scales with the screen and the OS text-size setting
     }
   });
 
   return {styles};
 };
-
-function getBackgroundColorByGroup(breakpointGroup) {
-  switch(breakpointGroup) {
-    case 'group1': return 'lightgreen';
-    case 'group2': return 'lightpink';
-    case 'group3': return 'lightyellow';
-    case 'group4': return 'lightcoral';
-    case 'group5': return 'lightskyblue';
-    case 'group6': return 'lightsteelblue';
-    default: return 'white';
-  }
-}
 
 export default App;
