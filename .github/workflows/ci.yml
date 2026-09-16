@@ -11,7 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [18, 20, 22]
+        # react-native-builder-bob 0.40 requires ^20.19 || ^22.12 || >=23.4,
+        # and `prepare: bob build` runs during `npm ci`. Node 18 is EOL.
+        node: [20, 22, 24]
 
     steps:
       - uses: actions/checkout@v4
