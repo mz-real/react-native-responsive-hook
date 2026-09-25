@@ -4,6 +4,11 @@ All notable changes to this package. Versions follow [Semantic Versioning](https
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-09-25
+
+### Docs
+- The README shows the example app in action: a GIF of the layout going from one to three columns as the window widens, and iPhone screenshots in portrait and landscape. No code changes.
+
 ## [1.6.1] - 2026-09-25
 
 A docs-only release. The README is rewritten in plainer language, and the code is unchanged.
@@ -134,7 +139,8 @@ A hotfix for the 1.0.x line. The API is unchanged.
 ### Package
 - The Expo example apps are no longer published with the package, which takes it from 33 files and 802 kB down to 8 files and 25.7 kB.
 
-[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.6.1...HEAD
+[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.6.2...HEAD
+[1.6.2]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.2
 [1.6.1]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.1
 [1.6.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.0
 [1.5.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.5.0
