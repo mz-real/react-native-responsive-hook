@@ -1,0 +1,6 @@
+{
+  "main": "../lib/commonjs/testing.js",
+  "module": "../lib/module/testing.js",
+  "types": "../lib/typescript/commonjs/testing.d.ts",
+  "sideEffects": false
+}
