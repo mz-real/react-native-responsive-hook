@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { PixelRatio, Platform, useWindowDimensions } from 'react-native';
 
 import { baseFontSize, maxFontScaleFactor } from './constants.js';
+import { toNumber } from './toNumber.js';
 import { useResponsiveConfig } from './config.js';
 import {
   createSelect,
@@ -13,9 +14,6 @@ import {
 
 /** Accepts either `50` or `'50%'`. */
 export type Percent = number | string;
-
-const toNumber = (value: Percent): number =>
-  typeof value === 'number' ? value : parseFloat(value);
 
 /** Bounds on how far `fontSize` scales with the device, so a tablet does not
  *  receive double-size body text. */

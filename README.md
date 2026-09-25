@@ -152,7 +152,7 @@ Presence is checked against `undefined`, not truthiness, so `select({ sm: 0 })` 
 - `hp(percent)` — height as a percentage of the screen, in dp
 - `vw(percent)` / `vh(percent)` — viewport-relative units, floored
 
-All four accept `50` or `'50%'`.
+All four accept `50` or `'50%'`. In development (`__DEV__`), any size helper given something else — `''`, `'abc'`, `'50vw'`, `NaN` — logs a one-time warning instead of silently producing `NaN` or a surprising value; production output is unchanged.
 
 ### Fonts
 
