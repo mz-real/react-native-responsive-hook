@@ -45,6 +45,15 @@ export type UseResponsiveReturn = {
    * library's base device and rounded to the nearest pixel.
    */
   ms: (size: Percent, factor?: number) => number;
+  /** Linear scale by the shorter screen edge (size-matters `scale`). */
+  s: (size: Percent) => number;
+  /** Linear scale by the longer screen edge (size-matters `verticalScale`). */
+  vs: (size: Percent) => number;
+  /**
+   * Moderate vertical scale: moves `factor` (default 0.5) of the way from
+   * `size` to `vs(size)` (size-matters `moderateVerticalScale`).
+   */
+  mvs: (size: Percent, factor?: number) => number;
   /**
    * @deprecated Never scaled with the screen — it is a flat clamp at
    * `baseFontSize * maxFontScaleFactor`. Use `fontSize` instead.
@@ -105,6 +114,22 @@ export function useResponsive(): UseResponsiveReturn {
       return PixelRatio.roundToNearestPixel(n + (linear - n) * factor);
     };
 
+    // The longer edge, in both orientations.
+    const longEdge = Math.max(width, height);
+
+    const s = (size: Percent): number =>
+      PixelRatio.roundToNearestPixel((toNumber(size) * base) / baseDevice.width);
+
+    const verticalScale = (n: number): number => (n * longEdge) / baseDevice.height;
+
+    const vs = (size: Percent): number =>
+      PixelRatio.roundToNearestPixel(verticalScale(toNumber(size)));
+
+    const mvs = (size: Percent, factor = 0.5): number => {
+      const n = toNumber(size);
+      return PixelRatio.roundToNearestPixel(n + (verticalScale(n) - n) * factor);
+    };
+
     return {
       isLandscape,
       isPortrait,
@@ -124,6 +149,9 @@ export function useResponsive(): UseResponsiveReturn {
       rem,
       fontSize,
       ms,
+      s,
+      vs,
+      mvs,
 
       // Deprecated, behavior preserved exactly.
       rf: (size: Percent = 0) =>
