@@ -8,6 +8,7 @@
     "src",
     "lib",
     "testing",
+    "CHANGELOG.md",
     "!**/__tests__",
     "!**/*.test.ts",
     "!**/*.test.tsx"
