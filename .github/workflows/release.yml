@@ -1,0 +1,50 @@
+name: Release
+
+# Publishes to npm via trusted publishing (OIDC) — no npm token is stored in
+# the repo. Configure once on npmjs.com: package settings -> Trusted Publisher
+# -> GitHub Actions, repo mz-real/react-native-responsive-hook, workflow
+# release.yml.
+#
+# Run manually: gh workflow run release.yml -f ref=<sha|tag|branch> -f dist-tag=latest
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Commit, tag or branch to publish
+        required: true
+        default: master
+      dist-tag:
+        description: npm dist-tag to publish under
+        required: true
+        default: latest
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: actions/setup-node@v4
+        with:
+          # Trusted publishing needs npm >= 11.5.1, bundled with Node 24.
+          node-version: 24
+          registry-url: https://registry.npmjs.org
+
+      - run: npm ci
+
+      - name: Typecheck
+        if: ${{ hashFiles('tsconfig.json') != '' }}
+        run: npm run typecheck
+
+      - name: Test
+        run: npm test -- --ci
+
+      - name: Publish
+        run: npm publish --provenance --access public --tag "${{ inputs.dist-tag }}"
