@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for helping improve react-native-responsive-hook.
+Thanks for helping improve react-native-responsive-hook. Everyone taking part is expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Setup
 
