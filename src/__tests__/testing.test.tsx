@@ -60,6 +60,18 @@ describe('MockWindowProvider', () => {
     expect(capture((p) => p).wp(50)).toBe(187.5);
   });
 
+  it('shares one override context across separately loaded copies (ESM + CJS builds)', () => {
+    let first: unknown;
+    let second: unknown;
+    jest.isolateModules(() => {
+      first = require('../windowOverride').WindowOverrideContext;
+    });
+    jest.isolateModules(() => {
+      second = require('../windowOverride').WindowOverrideContext;
+    });
+    expect(first).toBe(second);
+  });
+
   it('rejects an invalid size', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     expect(() =>

@@ -1,5 +1,5 @@
+import { Platform } from 'react-native';
 import {
-  createContext,
   createElement,
   useContext,
   useEffect,
@@ -16,6 +16,7 @@ import {
   type Breakpoint,
   type BreakpointThresholds,
 } from './breakpoints.js';
+import { sharedContext } from './windowOverride.js';
 
 export type BaseDevice = { width: number; height: number };
 
@@ -132,7 +133,23 @@ export function resolveConfig(config: ResponsiveConfig = {}): ResolvedResponsive
 
 const DEFAULT_CONFIG = resolveConfig();
 
-const ResponsiveContext = createContext<ResolvedResponsiveConfig>(DEFAULT_CONFIG);
+const ResponsiveContext = sharedContext<ResolvedResponsiveConfig>(
+  'react-native-responsive-hook.config',
+  DEFAULT_CONFIG
+);
+
+/**
+ * Set once the first `ssr` provider has mounted on the client. Providers
+ * mounted later (screens, modals, client-side navigation) have no server
+ * HTML to match, so they render the real window straight away. Never set on
+ * the server, where effects do not run.
+ */
+let hasHydrated = false;
+
+/** Test hook: forget that hydration has happened. */
+export function __resetHydrationForTests(): void {
+  hasHydrated = false;
+}
 
 /**
  * Overrides the base device and/or breakpoint thresholds for every
@@ -159,6 +176,16 @@ export function ResponsiveProvider({
         if (isDevelopment()) {
           throw error;
         }
+        // If only the ssr flag is invalid, keep the rest of the config.
+        if (config?.ssr) {
+          try {
+            const withoutSsr = resolveConfig({ ...config, ssr: undefined });
+            console.error(`${(error as Error).message} Ignoring ssr.`);
+            return withoutSsr;
+          } catch {
+            // Something else is invalid too; fall through to the defaults.
+          }
+        }
         console.error(`${(error as Error).message} Using the defaults instead.`);
         return DEFAULT_CONFIG;
       }
@@ -183,10 +210,12 @@ export function ResponsiveProvider({
 
   // With `ssr`, keep rendering initialWindow until mounted so the first
   // client render matches the server HTML, then switch to the real window.
-  const [mounted, setMounted] = useState(false);
-  const ssrEnabled = value.ssr === true;
+  // Only on the web: native apps have no server HTML to match.
+  const ssrEnabled = value.ssr === true && Platform.OS === 'web';
+  const [mounted, setMounted] = useState(() => hasHydrated);
   useEffect(() => {
     if (ssrEnabled) {
+      hasHydrated = true;
       setMounted(true);
     }
   }, [ssrEnabled]);

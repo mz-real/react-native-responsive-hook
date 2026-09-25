@@ -84,6 +84,14 @@ export const remUnit = (size: number | string = 0): number => {
 export const responsiveFont = (size: number | string = 0): number =>
   Math.min(baseFontSize * maxFontScaleFactor, toNumber(size));
 
+/** React Native < 0.65 API, absent from current type definitions. */
+type LegacyDimensions = {
+  removeEventListener?: (
+    type: 'change',
+    handler: (dimensions: { window: ScaledSize }) => void
+  ) => void;
+};
+
 let orientationSubscription: { remove: () => void } | null = null;
 let orientationHandler: ((dimensions: { window: ScaledSize }) => void) | null = null;
 
@@ -116,23 +124,15 @@ export const listenOrientationChange = (that: {
 /**
  * @deprecated Pairs with `listenOrientationChange`. Use `useResponsive()`.
  */
-/** React Native < 0.65 API, absent from current type definitions. */
-type LegacyDimensions = {
-  removeEventListener?: (
-    type: 'change',
-    handler: (dimensions: { window: ScaledSize }) => void
-  ) => void;
-};
-
 export function removeOrientationListener(): void {
   // React Native >= 0.65 returns a subscription; >= 0.72 dropped
   // Dimensions.removeEventListener entirely.
   if (orientationSubscription && typeof orientationSubscription.remove === 'function') {
     orientationSubscription.remove();
   } else if (orientationHandler) {
-    const { removeEventListener } = Dimensions as LegacyDimensions;
-    if (typeof removeEventListener === 'function') {
-      removeEventListener('change', orientationHandler);
+    const legacy = Dimensions as LegacyDimensions;
+    if (typeof legacy.removeEventListener === 'function') {
+      legacy.removeEventListener('change', orientationHandler);
     }
   }
 

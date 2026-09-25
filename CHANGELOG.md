@@ -6,7 +6,11 @@ All notable changes to this package. Versions follow [Semantic Versioning](https
 
 ### Added
 - **`react-native-responsive-hook/testing`** with `MockWindowProvider`: renders everything below it at a chosen window size, for tests, Storybook and previews, without mocking `useWindowDimensions`.
-- **`ssr: true`** on `ResponsiveProvider` (with `initialWindow`): renders with `initialWindow` until mounted, so server HTML and the client's first render match for every client.
+- **`ssr: true`** on `ResponsiveProvider` (with `initialWindow`): renders with `initialWindow` until mounted, so server HTML and the client's first render match for every client. Web only, first hydration only (later-mounted providers render the real window at once), StrictMode-safe. In production an invalid `ssr` (no `initialWindow`) is ignored while the rest of the config is kept.
+
+### Fixed
+- The config and window-override contexts are shared across the package's ESM and CommonJS builds, so providers work even when an app loads both.
+- `removeOrientationListener` has its `@deprecated` JSDoc again in the published types.
 
 ### Repository
 - ESLint (typescript-eslint, React Hooks rules) in CI.

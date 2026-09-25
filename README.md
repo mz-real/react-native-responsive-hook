@@ -223,7 +223,7 @@ it('shows two columns on a tablet', () => {
 });
 ```
 
-`fontScale` is optional (defaults to 1). It composes with `ResponsiveProvider`, which still supplies the config.
+`fontScale` is optional (defaults to 1). It composes with `ResponsiveProvider`, which still supplies the config. It affects this library's hooks only — not React Native's own `Dimensions` / `useWindowDimensions` or the deprecated module-level exports.
 
 ### Platform & orientation
 
@@ -251,7 +251,7 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 - Passing an inline object is fine — the hook's memoized values stay stable across re-renders as long as the numbers don't change.
 - A nested provider resolves its config against the defaults, not against its parent.
 - `initialWindow: { width, height, fontScale? }` is used while React Native reports an unmeasured 0×0 window — during server-side rendering on the web (Expo Router, Next.js with react-native-web) and in rare native first renders — instead of rendering with `xs` and zeros. It is ignored as soon as the real window has a size, and its `fontScale` defaults to 1. On its own it only avoids a hydration mismatch for clients whose window matches it, because react-native-web measures the real window on the client's first render.
-- `ssr: true` (with `initialWindow`) removes the mismatch for every client: the provider renders with `initialWindow` until it has mounted — on the server and on the client's first render alike — then switches to the real window. It costs one extra render after mount, so enable it only for server-rendered web apps.
+- `ssr: true` (with `initialWindow`) removes the mismatch for every client: the provider renders with `initialWindow` until it has mounted — on the server and on the client's first render alike — then switches to the real window. Clients whose window differs from `initialWindow` see one layout change right after hydration. It applies only on the web (ignored on iOS/Android, so a shared Expo Router layout is fine) and only to the first hydration: providers mounted later, e.g. on client-side navigation, render the real window immediately. It covers `useResponsive()` and `createResponsiveStyles` output, not direct `useWindowDimensions` calls or the deprecated module-level exports. Nested providers don't inherit it — repeat `ssr` and `initialWindow` on them.
 - The deprecated module-level exports (`widthPercentageToDP`, the `breakpointGroup` constant, …) have no access to React context and ignore the provider.
 
 ## Migrating from 1.0.x
