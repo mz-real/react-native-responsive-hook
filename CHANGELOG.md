@@ -4,6 +4,8 @@ All notable changes to this package. Versions follow [Semantic Versioning](https
 
 ## [Unreleased]
 
+## [1.6.0] — 2026-09-25
+
 ### Added
 - **`react-native-responsive-hook/testing`** with `MockWindowProvider`: renders everything below it at a chosen window size, for tests, Storybook and previews, without mocking `useWindowDimensions`.
 - **`ssr: true`** on `ResponsiveProvider` (with `initialWindow`): renders with `initialWindow` until mounted, so server HTML and the client's first render match for every client. Web only, first hydration only (later-mounted providers render the real window at once), StrictMode-safe. In production an invalid `ssr` (no `initialWindow`) is ignored while the rest of the config is kept.
@@ -123,7 +125,8 @@ Hotfix for 1.0.x. No API changes.
 - **Fixed `removeOrientationListener()`.** It called `Dimensions.removeEventListener`, which was removed in RN 0.72, so it threw a `TypeError`. It also never removed the handler that had been registered. It now keeps the subscription and calls `.remove()` on it.
 - **Smaller package.** The bundled Expo example apps are no longer published: 33 files / 802 kB went down to 8 files / 25.7 kB.
 
-[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.0
 [1.5.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.5.0
 [1.4.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.4.0
 [1.3.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.3.0
