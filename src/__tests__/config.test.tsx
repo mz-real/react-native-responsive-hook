@@ -117,6 +117,13 @@ describe('initialWindow (SSR / first render)', () => {
     expect(hook.current.wp(50)).toBe(187.5);
   });
 
+  it('keeps a known real width when only the height is 0', () => {
+    rn.__state.width = 1024;
+    rn.__state.height = 0;
+    const hook = renderWithConfig(() => ({ initialWindow: { width: 375, height: 812 } }));
+    expect(hook.current.wp(50)).toBe(512);
+  });
+
   it('defaults its font scale to 1', () => {
     rn.__state.width = 0;
     rn.__state.height = 0;

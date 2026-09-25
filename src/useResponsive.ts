@@ -81,13 +81,13 @@ export type UseResponsiveReturn = {
  * render.
  */
 export function useResponsive(): UseResponsiveReturn {
-  const window = useWindowDimensions();
+  const windowDimensions = useWindowDimensions();
   const { baseDevice, breakpoints, initialWindow } = useResponsiveConfig();
-  // Until the real window has a size (SSR on the web, some first renders),
-  // fall back to the provider's initialWindow when one is configured.
-  const hasSize = window.width > 0 && window.height > 0;
+  // While the window is unmeasured (0x0: server rendering on the web, rare
+  // native first renders), fall back to the provider's initialWindow.
+  const unmeasured = windowDimensions.width === 0 && windowDimensions.height === 0;
   const { width, height, fontScale } =
-    !hasSize && initialWindow ? initialWindow : window;
+    unmeasured && initialWindow ? initialWindow : windowDimensions;
 
   return useMemo<UseResponsiveReturn>(() => {
     const isLandscape = width > height;

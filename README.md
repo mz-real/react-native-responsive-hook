@@ -152,7 +152,7 @@ Presence is checked against `undefined`, not truthiness, so `select({ sm: 0 })` 
 - `hp(percent)` — height as a percentage of the screen, in dp
 - `vw(percent)` / `vh(percent)` — viewport-relative units, floored
 
-All four accept `50` or `'50%'`. In development (`__DEV__`), any size helper given something else — `''`, `'abc'`, `'50vw'`, `NaN` — logs a one-time warning instead of silently producing `NaN` or a surprising value; production output is unchanged.
+All four accept `50` or `'50%'`. Any size helper given something else — `''`, `'abc'`, `'50vw'`, `NaN` — still returns the same value as before, but when `__DEV__` is defined and true it also logs a one-time warning per input (at most 20, then goes quiet). Note that React Native's Jest preset sets `__DEV__`, so these warnings can appear in your test runs.
 
 ### Fonts
 
@@ -222,7 +222,7 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 - Thresholds must be positive and strictly ascending (`sm < md < lg < xl < xxl`), otherwise the provider throws an error naming the offending keys. If you raise one threshold past the next default (e.g. `sm: 700` while `md` is still 600), set the keys above it too.
 - Passing an inline object is fine — the hook's memoized values stay stable across re-renders as long as the numbers don't change.
 - A nested provider resolves its config against the defaults, not against its parent.
-- `initialWindow: { width, height, fontScale? }` is used while React Native reports a 0×0 window — during server-side rendering on the web (Expo Router, Next.js with react-native-web) and on some first renders — so the server renders the same breakpoint and sizes you expect on the client instead of `xs` and zeros. It is ignored as soon as the real window has a size. Pick the size your most common client uses, e.g. `{ width: 1280, height: 800 }` for a desktop-first web app.
+- `initialWindow: { width, height, fontScale? }` is used while React Native reports an unmeasured 0×0 window — during server-side rendering on the web (Expo Router, Next.js with react-native-web) and in rare native first renders — instead of rendering with `xs` and zeros. It is ignored as soon as the real window has a size, and its `fontScale` defaults to 1. It only avoids a hydration mismatch for clients whose window matches it: react-native-web measures the real window on the client's first render, so for other sizes, render size-dependent UI after mount (or use CSS media queries) if you need an exact match.
 - The deprecated module-level exports (`widthPercentageToDP`, the `breakpointGroup` constant, …) have no access to React context and ignore the provider.
 
 ## Migrating from 1.0.x
