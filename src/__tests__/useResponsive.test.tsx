@@ -174,3 +174,37 @@ describe('deprecated helpers', () => {
     expect(current.rf(10)).toBe(10);
   });
 });
+
+describe('ms (moderate scale)', () => {
+  it('returns the input unchanged on the baseline device', () => {
+    expect(renderHook().current.ms(16)).toBe(16);
+  });
+
+  it('scales halfway towards linear by default', () => {
+    setScreen(768, 1024);
+    // 16 + (16 * 768/375 - 16) * 0.5 = 24.38 -> nearest half pixel
+    expect(renderHook().current.ms(16)).toBe(24.5);
+  });
+
+  it('scales down on a small phone', () => {
+    setScreen(320, 568);
+    // 16 + (16 * 320/375 - 16) * 0.5 = 14.83
+    expect(renderHook().current.ms(16)).toBe(15);
+  });
+
+  it('respects the factor argument', () => {
+    setScreen(768, 1024);
+    expect(renderHook().current.ms(16, 0)).toBe(16);
+    expect(renderHook().current.ms(16, 1)).toBe(33);
+  });
+
+  it('uses the shorter edge, so orientation does not change the result', () => {
+    setScreen(812, 375);
+    expect(renderHook().current.ms(16)).toBe(16);
+  });
+
+  it('accepts string input like the other helpers', () => {
+    setScreen(768, 1024);
+    expect(renderHook().current.ms('16')).toBe(24.5);
+  });
+});

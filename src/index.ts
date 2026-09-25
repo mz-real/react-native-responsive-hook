@@ -7,6 +7,10 @@ import { useResponsive } from './useResponsive';
 export { useResponsive };
 export default useResponsive;
 
+export { ResponsiveProvider } from './config';
+export type { ResponsiveConfig, BaseDevice } from './config';
+export type { BreakpointThresholds } from './breakpoints';
+
 export type { Breakpoint, BreakpointMap } from './breakpoints';
 export type { UseResponsiveReturn, Percent } from './useResponsive';
 
