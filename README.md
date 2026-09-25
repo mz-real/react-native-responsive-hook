@@ -140,6 +140,17 @@ All four accept `50` or `'50%'`.
 - `ms(size, factor = 0.5)` — moderate scale: moves `factor` of the way from `size` towards full linear scaling with the shorter edge. `ms(16)` is 16 on the 375dp baseline and ~24.5 on a 768dp tablet. Same formula as `moderateScale` from react-native-size-matters, but against a 375dp baseline (size-matters uses 350) and rounded to the nearest pixel, so values differ slightly; set `baseDevice: { width: 350, height: 680 }` on [`ResponsiveProvider`](#responsiveprovider) to match its baseline more closely.
 - `rem(size)` — scales linearly against a 375dp baseline, with no accessibility scaling.
 
+### Scale helpers (react-native-size-matters style)
+
+| This library | react-native-size-matters | Scales by |
+|---|---|---|
+| `s(size)` | `scale` / `s` | shorter edge ÷ base width |
+| `vs(size)` | `verticalScale` / `vs` | longer edge ÷ base height |
+| `ms(size, factor = 0.5)` | `moderateScale` / `ms` | halfway (by `factor`) towards `s` |
+| `mvs(size, factor = 0.5)` | `moderateVerticalScale` / `mvs` | halfway (by `factor`) towards `vs` |
+
+Unlike size-matters, these come from the hook, so they **update on rotation and window resize**. They scale against the base device (375 × 812 by default; size-matters uses 350 × 680 — set `baseDevice` on [`ResponsiveProvider`](#responsiveprovider) to match) and round to the nearest pixel.
+
 ### Platform & orientation
 
 `isIOS`, `isAndroid`, `isLandscape`, `isPortrait`.

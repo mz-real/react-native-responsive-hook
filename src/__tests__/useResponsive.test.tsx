@@ -193,6 +193,44 @@ describe('deprecated helpers', () => {
   });
 });
 
+describe('s / vs / mvs (size-matters style scaling)', () => {
+  it('returns the input unchanged on the baseline device', () => {
+    const { current } = renderHook();
+    expect(current.s(16)).toBe(16);
+    expect(current.vs(16)).toBe(16);
+    expect(current.mvs(16)).toBe(16);
+  });
+
+  it('scales s by the shorter edge and vs by the longer edge', () => {
+    setScreen(768, 1024);
+    const { current } = renderHook();
+    // 16 * 768/375 = 32.77 ; 16 * 1024/812 = 20.18
+    expect(current.s(16)).toBe(33);
+    expect(current.vs(16)).toBe(20);
+  });
+
+  it('moves mvs halfway towards vs by default, and respects factor', () => {
+    setScreen(768, 1024);
+    const { current } = renderHook();
+    // 16 + (20.18 - 16) * 0.5 = 18.09
+    expect(current.mvs(16)).toBe(18);
+    expect(current.mvs(16, 0)).toBe(16);
+    expect(current.mvs(16, 1)).toBe(20);
+  });
+
+  it('is orientation independent', () => {
+    setScreen(812, 375);
+    const { current } = renderHook();
+    expect(current.s(16)).toBe(16);
+    expect(current.vs(16)).toBe(16);
+  });
+
+  it('accepts string input', () => {
+    setScreen(768, 1024);
+    expect(renderHook().current.s('16')).toBe(33);
+  });
+});
+
 describe('ms (moderate scale)', () => {
   it('returns the input unchanged on the baseline device', () => {
     expect(renderHook().current.ms(16)).toBe(16);
