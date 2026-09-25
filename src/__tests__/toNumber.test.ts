@@ -22,6 +22,10 @@ describe('toNumber', () => {
     ['50%', 50],
     [' 12.5 % ', 12.5],
     ['-10', -10],
+    ['1e3', 1000],
+    ['+5', 5],
+    ['1e-7%', 1e-7],
+    ['1E+21', 1e21],
   ])('converts %p to %p without warning', (input, expected) => {
     expect(toNumber(input)).toBe(expected);
     expect(warn).not.toHaveBeenCalled();
@@ -44,6 +48,14 @@ describe('toNumber', () => {
     toNumber('abc');
     toNumber('abc');
     expect(warn).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops warning after 20 distinct inputs, saying so once', () => {
+    for (let i = 0; i < 30; i += 1) {
+      toNumber(`${i}vw`);
+    }
+    expect(warn).toHaveBeenCalledTimes(21);
+    expect(warn.mock.calls[20][0]).toMatch(/further warnings suppressed/);
   });
 
   it('warns about non-finite numbers', () => {

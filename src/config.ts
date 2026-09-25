@@ -26,9 +26,11 @@ export type ResponsiveConfig = {
   /** Minimum width in dp for each breakpoint. Omitted keys keep their defaults. */
   breakpoints?: Partial<BreakpointThresholds>;
   /**
-   * Window size used while React Native reports a 0x0 window -- during
-   * server-side rendering on the web, and on some first renders. Ignored as
-   * soon as the real window has a size.
+   * Window size used while React Native reports an unmeasured 0x0 window --
+   * server-side rendering on the web, rare native first renders. Ignored as
+   * soon as the real window has a size. Only matches hydration for clients
+   * whose window equals it; react-native-web measures on the first client
+   * render.
    */
   initialWindow?: InitialWindow;
 };

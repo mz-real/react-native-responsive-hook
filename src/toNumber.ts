@@ -1,7 +1,12 @@
 declare const __DEV__: boolean | undefined;
 
-/** A plain number, optionally followed by `%`, with surrounding whitespace. */
-const NUMERIC_INPUT = /^\s*-?(\d+\.?\d*|\.\d+)\s*%?\s*$/;
+/** A plain number (optionally signed or in exponent form, as `String(n)`
+ *  produces), optionally followed by `%`, with surrounding whitespace. */
+const NUMERIC_INPUT = /^\s*[+-]?(\d+\.?\d*|\.\d+)(e[+-]?\d+)?\s*%?\s*$/i;
+
+/** Distinct invalid inputs reported before going quiet, so values that
+ *  change every frame (animations, scroll) cannot flood the console. */
+const MAX_WARNINGS = 20;
 
 const warned = new Set<string>();
 
@@ -12,10 +17,16 @@ export function resetWarnedInputs(): void {
 
 function warnOnce(value: number | string): void {
   const key = `${typeof value}:${String(value)}`;
-  if (warned.has(key)) {
+  if (warned.has(key) || warned.size > MAX_WARNINGS) {
     return;
   }
   warned.add(key);
+  if (warned.size > MAX_WARNINGS) {
+    console.warn(
+      'react-native-responsive-hook: invalid size inputs keep arriving; further warnings suppressed.'
+    );
+    return;
+  }
   console.warn(
     `react-native-responsive-hook: expected a number or a percentage string like '50%', got ${
       typeof value === 'string' ? `'${value}'` : String(value)
