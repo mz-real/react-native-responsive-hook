@@ -82,6 +82,12 @@ describe('ResponsiveProvider', () => {
     expect(current!.breakpoint).toBe('sm');
   });
 
+  it('uses the defaults when the provider is given no config', () => {
+    rn.__state.width = 550;
+    const hook = renderWithConfig(() => undefined);
+    expect(hook.current.breakpoint).toBe('sm');
+  });
+
   it('behaves exactly as before when no provider is present', () => {
     // Covered in depth by useResponsive.test.tsx; this pins the default.
     expect(resolveConfig()).toEqual({

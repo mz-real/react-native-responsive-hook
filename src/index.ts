@@ -1,4 +1,4 @@
-import { Dimensions, PixelRatio, Platform } from 'react-native';
+import { Dimensions, PixelRatio, Platform, type ScaledSize } from 'react-native';
 
 import { baseDevice, baseFontSize, maxFontScaleFactor } from './constants';
 import { resolveBreakpoint, LEGACY_GROUP_BY_BREAKPOINT } from './breakpoints';
@@ -11,7 +11,7 @@ export { ResponsiveProvider } from './config';
 export type { ResponsiveConfig, BaseDevice } from './config';
 export type { BreakpointThresholds } from './breakpoints';
 
-export type { Breakpoint, BreakpointMap } from './breakpoints';
+export type { Breakpoint, BreakpointMap, Select } from './breakpoints';
 export type { UseResponsiveReturn, Percent } from './useResponsive';
 
 /* ------------------------------------------------------------------ *
@@ -44,7 +44,7 @@ export const isLandscape = screenWidth > screenHeight;
 export const isPortrait = screenWidth < screenHeight;
 
 /** The shorter screen edge, used as the font-scaling baseline. */
-const base = Math.min(screenWidth, screenHeight);
+let base = Math.min(screenWidth, screenHeight);
 
 /** @deprecated Snapshot at import. Read `breakpointGroup` -- or better,
  *  `breakpoint` -- from `useResponsive()`. */
@@ -86,7 +86,7 @@ export const responsiveFont = (size: number | string = 0): number =>
   Math.min(baseFontSize * maxFontScaleFactor, toNumber(size));
 
 let orientationSubscription: { remove: () => void } | null = null;
-let orientationHandler: ((dimensions: any) => void) | null = null;
+let orientationHandler: ((dimensions: { window: ScaledSize }) => void) | null = null;
 
 /**
  * @deprecated Class-component helper. Use `useResponsive()`, which tracks
@@ -95,9 +95,13 @@ let orientationHandler: ((dimensions: any) => void) | null = null;
 export const listenOrientationChange = (that: {
   setState: (state: { orientation: 'portrait' | 'landscape' }) => void;
 }): void => {
-  orientationHandler = (newDimensions: any) => {
+  // A second call would otherwise orphan the first subscription.
+  removeOrientationListener();
+
+  orientationHandler = (newDimensions) => {
     screenWidth = newDimensions.window.width;
     screenHeight = newDimensions.window.height;
+    base = Math.min(screenWidth, screenHeight);
 
     that.setState({
       orientation: screenWidth < screenHeight ? 'portrait' : 'landscape',
@@ -113,7 +117,7 @@ export const listenOrientationChange = (that: {
 /**
  * @deprecated Pairs with `listenOrientationChange`. Use `useResponsive()`.
  */
-export const removeOrientationListener = (): void => {
+export function removeOrientationListener(): void {
   // React Native >= 0.65 returns a subscription; >= 0.72 dropped
   // Dimensions.removeEventListener entirely.
   if (orientationSubscription && typeof orientationSubscription.remove === 'function') {
@@ -127,4 +131,4 @@ export const removeOrientationListener = (): void => {
 
   orientationSubscription = null;
   orientationHandler = null;
-};
+}

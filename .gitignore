@@ -6,3 +6,4 @@ lib/
 
 # Local design notes, not published
 docs/superpowers/
+coverage/

@@ -130,6 +130,12 @@ describe('fontSize', () => {
     expect(current.fontSize(16)).toBe(24);
   });
 
+  it('treats a missing font scale as 1 instead of returning NaN', () => {
+    // Older react-native-web and some test mocks omit fontScale.
+    rn.__state.fontScale = undefined;
+    expect(renderHook().current.fontSize(16)).toBe(16);
+  });
+
   it('caps the OS font scale at maxFontScaleFactor', () => {
     setScreen(375, 812, 5);
     const { current } = renderHook();
@@ -166,6 +172,18 @@ describe('deprecated helpers', () => {
   it('rem keeps its historical scaling', () => {
     const { current } = renderHook();
     expect(current.rem(16)).toBe(16);
+  });
+
+  it('rem applies the 0.9 multiplier on screens shorter than the baseline', () => {
+    setScreen(320, 568);
+    // floor(320 / 375 * 16 * 0.9)
+    expect(renderHook().current.rem(16)).toBe(12);
+  });
+
+  it('rem and rf default their size to 0', () => {
+    const { current } = renderHook();
+    expect(current.rem()).toBe(0);
+    expect(current.rf()).toBe(0);
   });
 
   it('rf keeps its historical flat clamp', () => {

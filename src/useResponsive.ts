@@ -8,7 +8,7 @@ import {
   resolveBreakpoint,
   LEGACY_GROUP_BY_BREAKPOINT,
   type Breakpoint,
-  type BreakpointMap,
+  type Select,
 } from './breakpoints';
 
 /** Accepts either `50` or `'50%'`. */
@@ -30,7 +30,7 @@ export type UseResponsiveReturn = {
   /** Named breakpoint for the current width. */
   breakpoint: Breakpoint;
   /** Mobile-first value picker keyed on the current breakpoint. */
-  select: <T>(map: BreakpointMap<T>) => T | undefined;
+  select: Select;
   wp: (widthPercent: Percent) => number;
   hp: (heightPercent: Percent) => number;
   vw: (widthPercent: Percent) => number;
@@ -90,7 +90,10 @@ export function useResponsive(): UseResponsiveReturn {
       );
       // Honours the OS text-size setting, capped so extreme accessibility
       // scales cannot break layouts outright.
-      const accessibilityScale = Math.min(fontScale, maxFontScaleFactor);
+      // Older react-native-web and some test mocks omit fontScale; treat a
+      // missing or invalid value as the default 1 rather than yielding NaN.
+      const osScale = Number.isFinite(fontScale) && fontScale > 0 ? fontScale : 1;
+      const accessibilityScale = Math.min(osScale, maxFontScaleFactor);
       return PixelRatio.roundToNearestPixel(
         toNumber(size) * ratio * accessibilityScale
       );

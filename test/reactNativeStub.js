@@ -16,6 +16,11 @@ const Dimensions = {
   addEventListener: (type, handler) => {
     const entry = { type, handler };
     state.listeners.push(entry);
+    // React Native < 0.65 returned nothing from addEventListener; simulate it
+    // alongside the removeEventListener API of that era.
+    if (state.includeRemoveEventListener) {
+      return undefined;
+    }
     return {
       remove: () => {
         state.listeners = state.listeners.filter((l) => l !== entry);
