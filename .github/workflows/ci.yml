@@ -33,3 +33,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Check published package (publint, are-the-types-wrong)
+        run: npm run lint:package

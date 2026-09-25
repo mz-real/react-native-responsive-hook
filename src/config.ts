@@ -1,12 +1,19 @@
-import { createContext, createElement, useContext, useMemo, type ReactNode } from 'react';
+import {
+  createContext,
+  createElement,
+  useContext,
+  useMemo,
+  type ReactElement,
+  type ReactNode,
+} from 'react';
 
-import { baseDevice as defaultBaseDevice } from './constants';
+import { baseDevice as defaultBaseDevice } from './constants.js';
 import {
   BREAKPOINT_ORDER,
   DEFAULT_THRESHOLDS,
   type Breakpoint,
   type BreakpointThresholds,
-} from './breakpoints';
+} from './breakpoints.js';
 
 export type BaseDevice = { width: number; height: number };
 
@@ -80,7 +87,7 @@ export function ResponsiveProvider({
 }: {
   config?: ResponsiveConfig;
   children?: ReactNode;
-}) {
+}): ReactElement {
   const { baseDevice, breakpoints } = config ?? {};
   // Keyed on primitives so an inline `config={{ ... }}` does not produce a
   // new context value -- and invalidate every consumer's memo -- each render.

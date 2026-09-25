@@ -2,7 +2,7 @@
   "name": "react-native-responsive-hook",
   "version": "1.2.0",
   "license": "MIT",
-  "description": "Make React Native views responsive for all devices with the use of 2 simple methods.",
+  "description": "Responsive React Native hooks: breakpoints, select(), accessible font scaling, wp/hp and moderate scale that update on rotation. TypeScript, Expo and web ready.",
   "main": "./lib/commonjs/index.js",
   "files": [
     "src",
@@ -15,7 +15,8 @@
     "test": "jest",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
     "build": "bob build",
-    "prepare": "bob build"
+    "prepare": "bob build",
+    "lint:package": "publint && attw --pack ."
   },
   "repository": {
     "type": "git",
@@ -31,9 +32,19 @@
     "useResponsive",
     "font-scaling",
     "accessibility",
-    "expo"
+    "expo",
+    "responsive-screen",
+    "size-matters",
+    "scale",
+    "moderate-scale",
+    "widthPercentageToDP",
+    "heightPercentageToDP",
+    "orientation",
+    "tablet",
+    "react-native-web",
+    "typescript"
   ],
-  "homepage": "https://github.com/mz-real/react-native-responsive-hook.git#readme",
+  "homepage": "https://github.com/mz-real/react-native-responsive-hook#readme",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-native": ">=0.61"
@@ -44,6 +55,7 @@
   },
   "author": "Muhammad Zakria",
   "devDependencies": {
+    "@arethetypeswrong/cli": "^0.18.5",
     "@babel/core": "^7.29.7",
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
@@ -54,6 +66,7 @@
     "@types/react-test-renderer": "^18.3.1",
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
+    "publint": "^0.3.24",
     "react": "^18.3.1",
     "react-native": "^0.76.9",
     "react-native-builder-bob": "^0.40.18",

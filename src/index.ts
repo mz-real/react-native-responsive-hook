@@ -1,18 +1,18 @@
 import { Dimensions, PixelRatio, Platform, type ScaledSize } from 'react-native';
 
-import { baseDevice, baseFontSize, maxFontScaleFactor } from './constants';
-import { resolveBreakpoint, LEGACY_GROUP_BY_BREAKPOINT } from './breakpoints';
-import { useResponsive } from './useResponsive';
+import { baseDevice, baseFontSize, maxFontScaleFactor } from './constants.js';
+import { resolveBreakpoint, LEGACY_GROUP_BY_BREAKPOINT } from './breakpoints.js';
+import { useResponsive } from './useResponsive.js';
 
 export { useResponsive };
 export default useResponsive;
 
-export { ResponsiveProvider } from './config';
-export type { ResponsiveConfig, BaseDevice } from './config';
-export type { BreakpointThresholds } from './breakpoints';
+export { ResponsiveProvider } from './config.js';
+export type { ResponsiveConfig, BaseDevice } from './config.js';
+export type { BreakpointThresholds } from './breakpoints.js';
 
-export type { Breakpoint, BreakpointMap, Select } from './breakpoints';
-export type { UseResponsiveReturn, Percent } from './useResponsive';
+export type { Breakpoint, BreakpointMap, Select } from './breakpoints.js';
+export type { UseResponsiveReturn, Percent } from './useResponsive.js';
 
 /* ------------------------------------------------------------------ *
  * Legacy API
