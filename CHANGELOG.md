@@ -4,7 +4,7 @@ All notable changes to this package. Versions follow [Semantic Versioning](https
 
 ## [Unreleased]
 
-## [1.6.0] — 2026-09-25
+## [1.6.0] - 2026-09-25
 
 ### Added
 - **`react-native-responsive-hook/testing`** with `MockWindowProvider`: renders everything below it at a chosen window size, for tests, Storybook and previews, without mocking `useWindowDimensions`.
@@ -18,14 +18,14 @@ All notable changes to this package. Versions follow [Semantic Versioning](https
 - ESLint (typescript-eslint, React Hooks rules) in CI.
 - `examples/` replaced by a current Expo SDK 57 example app in `example/`, type-checked and bundled in CI.
 
-## [1.5.0] — 2026-09-25
+## [1.5.0] - 2026-09-25
 
 ### Changed
 - **An invalid `ResponsiveProvider` config no longer crashes production apps.** In development it still throws an error naming the offending keys. In production (`__DEV__` false, or `NODE_ENV=production` where `__DEV__` is not defined) it logs that error with `console.error` and uses the default config.
 
 No other changes. Valid configs behave exactly as before.
 
-## [1.4.0] — 2026-09-25
+## [1.4.0] - 2026-09-25
 
 Backwards compatible. Return values are unchanged everywhere.
 
@@ -36,7 +36,7 @@ Backwards compatible. Return values are unchanged everywhere.
 ### CI
 - Every change is now type-checked as a React Native 0.81 consumer would see it, with both the default and the strict TypeScript API.
 
-## [1.3.0] — 2026-09-25
+## [1.3.0] - 2026-09-25
 
 Backwards compatible. With no provider, every existing output is unchanged.
 
@@ -61,7 +61,7 @@ Backwards compatible. With no provider, every existing output is unchanged.
 - Actions are pinned to commit SHAs. The release job refuses to republish an existing version and checks the packed package with publint and arethetypeswrong before publishing.
 - Added Dependabot, a bug-report form and CONTRIBUTING.md.
 
-## [1.2.1] — 2026-09-25
+## [1.2.1] - 2026-09-25
 
 Patch release: bug fixes and type improvements. Backwards compatible.
 
@@ -79,7 +79,7 @@ Patch release: bug fixes and type improvements. Backwards compatible.
 - Accurate npm description and keywords; README corrections.
 - CI enforces 100% test coverage and checks the packed package with publint and arethetypeswrong.
 
-## [1.2.0] — 2026-09-25
+## [1.2.0] - 2026-09-25
 
 Backwards compatible. With no provider, every existing output is unchanged.
 
@@ -98,7 +98,7 @@ Backwards compatible. With no provider, every existing output is unchanged.
 
 Published with npm provenance from GitHub Actions.
 
-## [1.1.0] — 2026-09-25
+## [1.1.0] - 2026-09-25
 
 TypeScript rewrite. Existing APIs are deprecated but still work, and nothing breaks.
 
@@ -117,7 +117,7 @@ TypeScript rewrite. Existing APIs are deprecated but still work, and nothing bre
 
 Published with npm provenance from GitHub Actions.
 
-## [1.0.5] — 2026-09-25
+## [1.0.5] - 2026-09-25
 
 Hotfix for 1.0.x. No API changes.
 

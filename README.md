@@ -1,6 +1,6 @@
 # react-native-responsive-hook
 
-**Responsive layouts for React Native that update on rotation** — named breakpoints, a mobile-first `select()`, accessible font scaling, `wp`/`hp` percentages and size-matters-style `s`/`vs`/`ms`/`mvs` scaling, all from one hook.
+Responsive layouts for React Native that keep up with rotation and window resizing. You get named breakpoints, a mobile-first `select()`, font scaling with sensible limits, `wp`/`hp` percentages and size-matters style `s`/`vs`/`ms`/`mvs` scaling, all from one hook.
 
 [![npm version](https://img.shields.io/npm/v/react-native-responsive-hook.svg)](https://www.npmjs.com/package/react-native-responsive-hook)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-responsive-hook.svg)](https://www.npmjs.com/package/react-native-responsive-hook)
@@ -21,7 +21,7 @@ function Card() {
 }
 ```
 
-## Why this one?
+## How it compares
 
 | | react-native-responsive-hook | react-native-size-matters | react-native-responsive-screen |
 |---|:-:|:-:|:-:|
@@ -34,15 +34,15 @@ function Card() {
 | TypeScript source, ESM + CJS | ✅ | types only | types only |
 | Tablet detection | ✅ `isTablet` | ❌ | ❌ |
 
-Pure JavaScript — no native code, works in Expo Go, on the New Architecture and with react-native-web. Written in TypeScript, 100% test coverage, published with [npm provenance](https://docs.npmjs.com/generating-provenance-statements).
+It's plain JavaScript with no native code, so it works in Expo Go, on the New Architecture and with react-native-web. The source is TypeScript, tests cover 100% of it, and every release is published with [npm provenance](https://docs.npmjs.com/generating-provenance-statements).
 
-**Requires** React 16.8+ and React Native 0.61+ (the hook depends on `useWindowDimensions`).
+You need React 16.8+ and React Native 0.61+, since the hook is built on `useWindowDimensions`.
 
-Background reading: [Creating responsive UIs in React Native made easy](https://medium.com/@mz-real/creating-responsive-uis-in-react-native-made-easy-with-react-native-responsive-hook-35fa5649cd5f).
+For a longer introduction, see [Creating responsive UIs in React Native made easy](https://medium.com/@mz-real/creating-responsive-uis-in-react-native-made-easy-with-react-native-responsive-hook-35fa5649cd5f).
 
 ## Example app
 
-[`example/`](example) is an Expo app built from this repo: a live breakpoint / window-size bar, a card grid whose column count follows `select()`, and a type-scale sample. Rotate the device or resize the browser window to watch it update.
+[`example/`](example) is a small Expo app that runs against this repo. It shows the current breakpoint and window size, a card grid whose column count comes from `select()`, and a type scale. Rotate the device or resize the browser window and watch it change.
 
 ```bash
 npm install && cd example && npm install && npx expo start
@@ -117,28 +117,28 @@ const useStyles = () => {
 export default App;
 ```
 
-Everything the hook returns is memoized against width, height, font scale and the [`ResponsiveProvider`](#responsiveprovider) config, so you can pass these functions to `useMemo` dependencies or `React.memo` children without causing extra renders.
+Everything the hook returns is memoized on width, height, font scale and the [`ResponsiveProvider`](#responsiveprovider) config. You can safely use these functions as `useMemo` dependencies or pass them to `React.memo` children.
 
 ## API
 
 ### Breakpoints
 
-`breakpoint` reports the current named breakpoint:
+`breakpoint` tells you which named breakpoint the current width falls in:
 
 | Name  | Width (dp)  |
 |-------|-------------|
 | `xs`  | below 400   |
-| `sm`  | 400 – <600  |
-| `md`  | 600 – <768  |
-| `lg`  | 768 – <1008 |
-| `xl`  | 1008 – <1280|
+| `sm`  | 400 to <600 |
+| `md`  | 600 to <768 |
+| `lg`  | 768 to <1008|
+| `xl`  | 1008 to <1280|
 | `xxl` | 1280 +      |
 
-Each breakpoint starts at its minimum width, so fractional widths (common on Android, e.g. `399.5`) fall into the lower breakpoint. The thresholds can be changed with [`ResponsiveProvider`](#responsiveprovider).
+Each breakpoint starts at its minimum width, so a fractional width like `399.5` (Android reports these) lands in the lower one. You can change the thresholds with [`ResponsiveProvider`](#responsiveprovider).
 
 ### `select(map)`
 
-Picks a value for the current breakpoint, cascading **downward** — mobile-first. Falls back to a `default` key, then `undefined`:
+Returns the value for the current breakpoint. If there's no entry for it, it looks at the next smaller breakpoint, and so on down (mobile-first). After that it uses the `default` key, and if there isn't one it returns `undefined`.
 
 ```ts
 select({ sm: 12, lg: 20 })
@@ -152,23 +152,23 @@ select({ sm: 12, default: 8 })
 // xs  -> 8
 ```
 
-Presence is checked against `undefined`, not truthiness, so `select({ sm: 0 })` correctly returns `0`.
+Only `undefined` counts as missing, so `select({ sm: 0 })` gives you `0`.
 
 ### Dimensions
 
-- `wp(percent)` — width as a percentage of the screen, in dp
-- `hp(percent)` — height as a percentage of the screen, in dp
-- `vw(percent)` / `vh(percent)` — viewport-relative units, floored
+- `wp(percent)`: a percentage of the screen width, in dp
+- `hp(percent)`: a percentage of the screen height, in dp
+- `vw(percent)` / `vh(percent)`: viewport units, rounded down
 
-All four accept `50` or `'50%'`. Any size helper given something else — `''`, `'abc'`, `'50vw'`, `NaN` — still returns the same value as before, but when `__DEV__` is defined and true it also logs a one-time warning per input (at most 20, then goes quiet). Note that React Native's Jest preset sets `__DEV__`, so these warnings can appear in your test runs.
+All four take either `50` or `'50%'`. If you pass something else, such as `''`, `'abc'`, `'50vw'` or `NaN`, you get the same value as before. In development (when `__DEV__` is true) you also get a console warning, once per input and at most 20 in total. React Native's Jest preset sets `__DEV__`, so you may see these warnings in test runs too.
 
 ### Fonts
 
-- `fontSize(size)` — scales with the device's shorter edge **and** applies the user's OS text-size setting (`useWindowDimensions().fontScale`) itself. Device scaling is clamped to 0.85×–1.3× so tablets don't get oversized body text, and the OS text scale is capped at 2×.
+- `fontSize(size)` scales with the shorter screen edge and also applies the user's OS text size (`useWindowDimensions().fontScale`). The device part is kept between 0.85× and 1.3× so tablets don't end up with huge body text, and the OS text scale is capped at 2×.
 
-  > **Use it with `<Text allowFontScaling={false}>`.** React Native's `<Text>` already multiplies `fontSize` by the OS text scale by default, so combining the two scales twice (a 1.5× setting becomes ~2.25×). Turning native scaling off lets `fontSize()` apply the OS scale once, with its 2× cap. If you prefer React Native's native scaling, use `s()` or `ms()` for font sizes instead and cap it with `maxFontSizeMultiplier`.
-- `ms(size, factor = 0.5)` — moderate scale: moves `factor` of the way from `size` towards full linear scaling with the shorter edge. `ms(16)` is 16 on the 375dp baseline and ~24.5 on a 768dp tablet. Same formula as `moderateScale` from react-native-size-matters, but against a 375dp baseline (size-matters uses 350) and rounded to the nearest pixel, so values differ slightly; set `baseDevice: { width: 350, height: 680 }` on [`ResponsiveProvider`](#responsiveprovider) to match its baseline more closely — note that `baseDevice` is shared, so this also shifts `fontSize`, `rem` and `ms` values.
-- `rem(size)` — scales linearly against a 375dp baseline, with no accessibility scaling.
+  > Use it with `<Text allowFontScaling={false}>`. By default React Native's `<Text>` already multiplies `fontSize` by the OS text scale, so using both would scale twice (a 1.5× setting turns into about 2.25×). With native scaling off, `fontSize()` applies the OS scale once and keeps its 2× cap. If you'd rather keep React Native's native scaling, size your fonts with `s()` or `ms()` and limit them with `maxFontSizeMultiplier`.
+- `ms(size, factor = 0.5)` is a moderate scale. It moves `factor` of the way from `size` towards full linear scaling with the shorter edge, so `ms(16)` is 16 on the 375dp baseline and about 24.5 on a 768dp tablet. The formula is the same as `moderateScale` in react-native-size-matters, but the baseline is 375dp instead of 350 and the result is rounded to the nearest pixel, so the numbers differ a little. To get closer to size-matters, set `baseDevice: { width: 350, height: 680 }` on [`ResponsiveProvider`](#responsiveprovider). Keep in mind that `baseDevice` is shared, so this also changes `fontSize`, `rem` and `ms` values.
+- `rem(size)` scales linearly against a 375dp baseline. It doesn't apply the OS text size.
 
 ### Scale helpers (react-native-size-matters style)
 
@@ -179,11 +179,11 @@ All four accept `50` or `'50%'`. Any size helper given something else — `''`, 
 | `ms(size, factor = 0.5)` | `moderateScale` / `ms` | halfway (by `factor`) towards `s` |
 | `mvs(size, factor = 0.5)` | `moderateVerticalScale` / `mvs` | halfway (by `factor`) towards `vs` |
 
-Unlike size-matters, these come from the hook, so they **update on rotation and window resize**. They scale against the base device (375 × 812 by default; size-matters uses 350 × 680 — set `baseDevice` on [`ResponsiveProvider`](#responsiveprovider) to match, but note that `baseDevice` is shared, so this also shifts `fontSize`, `rem` and `ms` values) and round to the nearest pixel.
+The difference from size-matters is that these come from the hook, so they update when the device rotates or the window is resized. They scale against the base device, which is 375 × 812 by default (size-matters uses 350 × 680), and round to the nearest pixel. You can match size-matters by setting `baseDevice` on [`ResponsiveProvider`](#responsiveprovider), with the same caveat as above: it also changes `fontSize`, `rem` and `ms`.
 
 ### `createResponsiveStyles(factory)`
 
-Call it once **at module scope** (not inside a component), using any of the helpers. The factory should only read what it is given; values from props or context belong in inline styles, since styles rebuild only on layout changes. It returns a hook; the styles are rebuilt only when the window size, font scale or provider config changes — so they **follow rotation** — and otherwise keep the same identity between renders.
+Call it once at module level, outside your components. It gives you back a hook. The styles are rebuilt only when the window size, font scale or provider config changes, so they follow rotation, and between those changes you get the same object back. Because of that, the factory should only use the helpers it's given. Anything that depends on props or context belongs in inline styles.
 
 ```tsx
 import { createResponsiveStyles } from 'react-native-responsive-hook';
@@ -203,11 +203,11 @@ function Card() {
 }
 ```
 
-It is fully typed: style values are checked against React Native's style types, with no casts needed.
+Style values are type-checked against React Native's own style types, and you don't need any casts.
 
 ### Testing and previews: `MockWindowProvider`
 
-`react-native-responsive-hook/testing` exports a provider that makes every `useResponsive()` and `createResponsiveStyles` hook below it see a window size you choose — for Jest tests, Storybook stories or previews. It doesn't depend on mocking `useWindowDimensions`, which newer React Native versions make difficult.
+`react-native-responsive-hook/testing` exports a provider that makes every `useResponsive()` and `createResponsiveStyles` hook inside it use a window size you pick. It's handy in Jest tests, Storybook stories and previews. You don't have to mock `useWindowDimensions`, which is awkward in newer React Native versions.
 
 ```tsx
 import { render } from '@testing-library/react-native';
@@ -223,15 +223,17 @@ it('shows two columns on a tablet', () => {
 });
 ```
 
-`fontScale` is optional (defaults to 1). It composes with `ResponsiveProvider`, which still supplies the config. It affects this library's hooks only — not React Native's own `Dimensions` / `useWindowDimensions` or the deprecated module-level exports.
+`fontScale` is optional and defaults to 1. You can combine it with `ResponsiveProvider`, which still provides the config. It only changes what this library's hooks see. React Native's own `Dimensions` and `useWindowDimensions`, and the deprecated module-level exports, still report the real window.
 
 ### Platform & orientation
 
-`isIOS`, `isAndroid`, `isLandscape`, `isPortrait`, and `isTablet` — true when the shorter edge of the **window** is at least 600dp (Android's `sw600dp` convention), so it doesn't flip on rotation. It follows the window, not the physical screen: it can change in iPad Split View or Android multi-window, and on the web it is true for any browser window at least 600dp on its shorter side.
+`isIOS`, `isAndroid`, `isLandscape`, `isPortrait` and `isTablet`.
+
+`isTablet` is true when the shorter side of the window is at least 600dp, the same rule Android uses for `sw600dp`, so rotating doesn't change it. It's based on the window rather than the physical screen. That means it can change in iPad Split View or Android multi-window, and on the web it's true for any browser window at least 600dp on its shorter side.
 
 ### `ResponsiveProvider`
 
-Optional. Wrap your app to change the design baseline or the breakpoint thresholds for every `useResponsive()` below it:
+This is optional. Wrap your app in it to change the design baseline or the breakpoint thresholds for every `useResponsive()` inside:
 
 ```tsx
 import { ResponsiveProvider } from 'react-native-responsive-hook';
@@ -246,42 +248,46 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 </ResponsiveProvider>
 ```
 
-- Without a provider, the defaults above apply, exactly as before.
-- Thresholds must be positive and strictly ascending (`sm < md < lg < xl < xxl`). An invalid config throws an error naming the offending keys **in development**; in production (`__DEV__` false, or `NODE_ENV=production` where `__DEV__` is not defined) it logs that error with `console.error` and falls back to the defaults, so a bad config never crashes a user's app. If you raise one threshold past the next default (e.g. `sm: 700` while `md` is still 600), set the keys above it too.
-- Passing an inline object is fine — the hook's memoized values stay stable across re-renders as long as the numbers don't change.
-- A nested provider resolves its config against the defaults, not against its parent.
-- `initialWindow: { width, height, fontScale? }` is used while React Native reports an unmeasured 0×0 window — during server-side rendering on the web (Expo Router, Next.js with react-native-web) and in rare native first renders — instead of rendering with `xs` and zeros. It is ignored as soon as the real window has a size, and its `fontScale` defaults to 1. On its own it only avoids a hydration mismatch for clients whose window matches it, because react-native-web measures the real window on the client's first render.
-- `ssr: true` (with `initialWindow`) removes the mismatch for every client: the provider renders with `initialWindow` until it has mounted — on the server and on the client's first render alike — then switches to the real window. Clients whose window differs from `initialWindow` see one layout change right after hydration. It applies only on the web (ignored on iOS/Android, so a shared Expo Router layout is fine) and only to the first hydration: providers mounted later, e.g. on client-side navigation, render the real window immediately. It covers `useResponsive()` and `createResponsiveStyles` output, not direct `useWindowDimensions` calls or the deprecated module-level exports. Nested providers don't inherit it — repeat `ssr` and `initialWindow` on them.
-- The deprecated module-level exports (`widthPercentageToDP`, the `breakpointGroup` constant, …) have no access to React context and ignore the provider.
+- Without a provider, the defaults above apply.
+- Thresholds have to be positive and go up in order (`sm < md < lg < xl < xxl`). In development an invalid config throws an error that names the problem key. In production (`__DEV__` false, or `NODE_ENV=production` where `__DEV__` isn't defined) it logs the same error with `console.error` and uses the defaults, so a bad config won't crash your users' app. If you raise one threshold past the next default, for example `sm: 700` while `md` is still 600, set the ones above it as well.
+- You can pass the config as an inline object. The memoized values only change when the numbers do.
+- A nested provider starts from the defaults. It doesn't inherit its parent's config.
+- `initialWindow: { width, height, fontScale? }` is the size to assume while React Native reports a 0×0 window. That happens during server-side rendering on the web (Expo Router, Next.js with react-native-web) and occasionally on a native first render. Without it you'd get `xs` and zero sizes. It stops being used as soon as the real window has a size, and `fontScale` defaults to 1. On its own it only prevents a hydration mismatch for visitors whose window happens to match it, because react-native-web measures the real window on the client's first render.
+- `ssr: true` (together with `initialWindow`) prevents the mismatch for every visitor. The provider renders with `initialWindow` until it has mounted, on the server and on the client's first render, and then switches to the real window. Visitors whose window is a different size will see the layout change once, right after the page loads.
+  - It only applies on the web. On iOS and Android it's ignored, so you can leave it on in a shared Expo Router layout.
+  - It only applies to the first page load. Providers that mount later, for example after client-side navigation, use the real window straight away.
+  - It covers what `useResponsive()` and `createResponsiveStyles` return, not direct `useWindowDimensions` calls or the deprecated module-level exports.
+  - Nested providers don't inherit it, so set `ssr` and `initialWindow` on them too.
+- The deprecated module-level exports (`widthPercentageToDP`, the `breakpointGroup` constant, and so on) can't read React context, so the provider has no effect on them.
 
 ## Migrating from 1.0.x
 
-**1.1.0 and later are backwards compatible.** Nothing is removed, and no existing function changed its output (apart from the bug fixes listed below). The items below are deprecated and still work.
+1.1.0 and every later version are backwards compatible. Nothing has been removed, and no existing function returns something different, apart from the bug fixes listed below. The APIs in this table are deprecated but still work.
 
 | Deprecated | Use instead | Notes |
 |---|---|---|
-| `rf(size)` | `fontSize(size)` | `rf` never scaled with the screen — it is a flat clamp at 32. Its behavior is unchanged, so upgrading will not shift your existing font sizes. |
+| `rf(size)` | `fontSize(size)` | Despite the name, `rf` never scaled with the screen. It just caps sizes at 32. That hasn't changed, so upgrading won't move your existing font sizes. |
 | `breakpointGroup` | `breakpoint` | `group1`…`group6` map to `xs`…`xxl` in order. |
 | `widthPercentageToDP` / `heightPercentageToDP` | `wp` / `hp` from the hook | |
 | `viewportWidthPercentage` / `viewportHeightPercentage` | `vw` / `vh` from the hook | |
 | `remUnit` / `responsiveFont` | `rem` / `fontSize` from the hook | |
-| `listenOrientationChange` / `removeOrientationListener` | `useResponsive()` | The hook tracks dimensions automatically. |
-| Module-level `isLandscape` / `isPortrait` / `breakpointGroup` | the hook's equivalents | The module-level constants are captured once at import and **never update on rotation**. |
+| `listenOrientationChange` / `removeOrientationListener` | `useResponsive()` | The hook tracks dimensions for you. |
+| Module-level `isLandscape` / `isPortrait` / `breakpointGroup` | the hook's equivalents | These are read once when the module loads and never update on rotation. |
 
 ### Fixed in 1.2.0
 
-- **Fractional widths resolve correctly.** A width between two whole-number ranges (e.g. `399.5`dp, which Android can report) used to fall through to `xxl`; it now resolves to the lower breakpoint (`xs`). A `NaN` width likewise resolves to `xs` instead of `xxl`.
+- Fractional widths now resolve correctly. A width between two whole-number ranges, like `399.5`dp (which Android can report), used to end up as `xxl`. It now goes to the lower breakpoint, `xs`. A `NaN` width also resolves to `xs` now instead of `xxl`.
 
 ### Fixed in 1.0.5 / 1.1.0
 
-- **The package no longer crashes on import.** 1.0.4 read `isLandscape` before it was declared, which threw `ReferenceError: Cannot access 'isLandscape' before initialization` under Hermes.
-- **`removeOrientationListener` works.** It called `Dimensions.removeEventListener`, removed in React Native 0.72, and even before that passed a throwaway function that removed nothing.
-- **`breakpointGroup` no longer returns `undefined`** above 8192dp.
-- **The published package shrank** from 802 kB to about 25 kB (packed) by no longer shipping three example apps.
+- Importing the package no longer crashes. 1.0.4 read `isLandscape` before declaring it, which threw `ReferenceError: Cannot access 'isLandscape' before initialization` on Hermes.
+- `removeOrientationListener` works. It used to call `Dimensions.removeEventListener`, which React Native 0.72 removed, and even before that it passed a new function that didn't match anything, so nothing was removed.
+- `breakpointGroup` no longer returns `undefined` above 8192dp.
+- The published package went from 802 kB to about 25 kB (packed), because it no longer ships three example apps.
 
 ## Want to Contribute?
 
-Your contributions are welcome! Feel free to submit pull requests or reach out at zakriamuhammad3637@gmail.com to discuss how you can get involved.
+Contributions are welcome. Open a pull request, or email zakriamuhammad3637@gmail.com if you'd like to talk something through first.
 
 ```bash
 npm install
