@@ -8,6 +8,7 @@ export { useResponsive };
 export default useResponsive;
 
 export { ResponsiveProvider } from './config.js';
+export { createResponsiveStyles } from './styles.js';
 export type { ResponsiveConfig, BaseDevice } from './config.js';
 export type { BreakpointThresholds } from './breakpoints.js';
 
