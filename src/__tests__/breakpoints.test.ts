@@ -2,6 +2,7 @@ import {
   createSelect,
   resolveBreakpoint,
   BREAKPOINT_ORDER,
+  DEFAULT_THRESHOLDS,
 } from '../breakpoints';
 
 describe('resolveBreakpoint', () => {
@@ -31,9 +32,25 @@ describe('resolveBreakpoint', () => {
     expect(resolveBreakpoint(-1)).toBe('xs');
   });
 
+  it.each([
+    [399.5, 'xs'],
+    [599.9, 'sm'],
+    [767.5, 'md'],
+    [1007.3, 'lg'],
+    [1279.99, 'xl'],
+  ])('resolves fractional width %p to the lower breakpoint %s', (width, expected) => {
+    expect(resolveBreakpoint(width)).toBe(expected);
+  });
+
+  it('honours custom thresholds', () => {
+    const thresholds = { ...DEFAULT_THRESHOLDS, md: 500 };
+    expect(resolveBreakpoint(499, thresholds)).toBe('sm');
+    expect(resolveBreakpoint(500, thresholds)).toBe('md');
+  });
+
   it('covers every name in BREAKPOINT_ORDER', () => {
     const resolved = new Set(
-      [0, 400, 600, 768, 1008, 1280].map(resolveBreakpoint)
+      [0, 400, 600, 768, 1008, 1280].map((w) => resolveBreakpoint(w))
     );
     expect(resolved).toEqual(new Set(BREAKPOINT_ORDER));
   });

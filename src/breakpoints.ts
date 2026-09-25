@@ -2,13 +2,15 @@ export const BREAKPOINT_ORDER = ['xs', 'sm', 'md', 'lg', 'xl', 'xxl'] as const;
 
 export type Breakpoint = (typeof BREAKPOINT_ORDER)[number];
 
-export const BREAKPOINT_RANGES: Record<Breakpoint, [number, number]> = {
-  xs: [0, 399],
-  sm: [400, 599],
-  md: [600, 767],
-  lg: [768, 1007],
-  xl: [1008, 1279],
-  xxl: [1280, Infinity],
+/** Minimum width in dp at which each breakpoint begins. `xs` starts at 0. */
+export type BreakpointThresholds = Record<Exclude<Breakpoint, 'xs'>, number>;
+
+export const DEFAULT_THRESHOLDS: BreakpointThresholds = {
+  sm: 400,
+  md: 600,
+  lg: 768,
+  xl: 1008,
+  xxl: 1280,
 };
 
 export const LEGACY_GROUP_BY_BREAKPOINT: Record<Breakpoint, string> = {
@@ -23,20 +25,25 @@ export const LEGACY_GROUP_BY_BREAKPOINT: Record<Breakpoint, string> = {
 export type BreakpointMap<T> = Partial<Record<Breakpoint, T>> & { default?: T };
 
 /**
- * Resolves a width in dp to its named breakpoint.
+ * Resolves a width in dp to its named breakpoint: the largest breakpoint
+ * whose threshold the width reaches.
  *
- * Negative widths clamp to the smallest breakpoint rather than returning
- * undefined, so a transient `0`/`-1` during a layout pass cannot produce a
- * missing value downstream.
+ * Thresholds rather than closed ranges, so fractional widths (common on
+ * Android) land in the lower breakpoint instead of falling between ranges.
+ * Negative widths resolve to `xs`, so a transient `0`/`-1` during a layout
+ * pass cannot produce a missing value downstream.
  */
-export function resolveBreakpoint(width: number): Breakpoint {
-  for (const name of BREAKPOINT_ORDER) {
-    const [min, max] = BREAKPOINT_RANGES[name];
-    if (width >= min && width <= max) {
+export function resolveBreakpoint(
+  width: number,
+  thresholds: BreakpointThresholds = DEFAULT_THRESHOLDS
+): Breakpoint {
+  for (let i = BREAKPOINT_ORDER.length - 1; i > 0; i -= 1) {
+    const name = BREAKPOINT_ORDER[i] as Exclude<Breakpoint, 'xs'>;
+    if (width >= thresholds[name]) {
       return name;
     }
   }
-  return width < 0 ? 'xs' : 'xxl';
+  return 'xs';
 }
 
 /**
