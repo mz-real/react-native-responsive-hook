@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { PixelRatio, Platform, useWindowDimensions } from 'react-native';
 
-import { baseDevice, baseFontSize, maxFontScaleFactor } from './constants';
+import { baseFontSize, maxFontScaleFactor } from './constants';
+import { useResponsiveConfig } from './config';
 import {
   createSelect,
   resolveBreakpoint,
@@ -38,6 +39,13 @@ export type UseResponsiveReturn = {
   /** Screen- and accessibility-aware font scaling. */
   fontSize: (size: Percent) => number;
   /**
+   * Moderate scale: scales with the device's shorter edge, but only by
+   * `factor` (default 0.5) of the full linear amount. Same formula as
+   * `moderateScale` in react-native-size-matters, but against this
+   * library's base device and rounded to the nearest pixel.
+   */
+  ms: (size: Percent, factor?: number) => number;
+  /**
    * @deprecated Never scaled with the screen — it is a flat clamp at
    * `baseFontSize * maxFontScaleFactor`. Use `fontSize` instead.
    */
@@ -58,6 +66,7 @@ export type UseResponsiveReturn = {
  */
 export function useResponsive(): UseResponsiveReturn {
   const { width, height, fontScale } = useWindowDimensions();
+  const { baseDevice, breakpoints } = useResponsiveConfig();
 
   return useMemo<UseResponsiveReturn>(() => {
     const isLandscape = width > height;
@@ -66,7 +75,7 @@ export function useResponsive(): UseResponsiveReturn {
     // The shorter edge, in both orientations.
     const base = Math.min(width, height);
 
-    const breakpoint = resolveBreakpoint(width);
+    const breakpoint = resolveBreakpoint(width, breakpoints);
 
     const rem = (size: Percent = 0): number => {
       const multiplier = Math.max(height, width) < baseDevice.height ? 0.9 : 1;
@@ -87,6 +96,12 @@ export function useResponsive(): UseResponsiveReturn {
       );
     };
 
+    const ms = (size: Percent, factor = 0.5): number => {
+      const n = toNumber(size);
+      const linear = (n * base) / baseDevice.width;
+      return PixelRatio.roundToNearestPixel(n + (linear - n) * factor);
+    };
+
     return {
       isLandscape,
       isPortrait,
@@ -105,13 +120,14 @@ export function useResponsive(): UseResponsiveReturn {
 
       rem,
       fontSize,
+      ms,
 
       // Deprecated, behavior preserved exactly.
       rf: (size: Percent = 0) =>
         Math.min(baseFontSize * maxFontScaleFactor, toNumber(size)),
       breakpointGroup: LEGACY_GROUP_BY_BREAKPOINT[breakpoint],
     };
-  }, [width, height, fontScale]);
+  }, [width, height, fontScale, baseDevice, breakpoints]);
 }
 
 export default useResponsive;
