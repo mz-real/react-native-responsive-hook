@@ -12,7 +12,7 @@ import { createResponsiveStyles } from 'react-native-responsive-hook';
 
 const useStyles = createResponsiveStyles(({ wp, select, fontSize }) => ({
   card: { width: wp(90), padding: select({ xs: 12, md: 24, default: 12 }) },
-  title: { fontSize: fontSize(18) }, // respects the OS text-size setting
+  title: { fontSize: fontSize(18) }, // scales with the device, capped for tablets
 }));
 
 function Card() {
@@ -27,7 +27,7 @@ function Card() {
 |---|:-:|:-:|:-:|
 | Updates on rotation / window resize | ✅ hook-based | ❌ computed once | ⚠️ manual listeners |
 | Named breakpoints + mobile-first `select()` | ✅ | ❌ | ❌ |
-| Respects OS font size (accessibility) | ✅ `fontSize()` | ❌ | ❌ |
+| Font size capped for tablets and large OS text sizes | ✅ `fontSize()` | ❌ | ❌ |
 | `wp` / `hp` percentages | ✅ | ❌ | ✅ |
 | `s` / `vs` / `ms` / `mvs` scaling | ✅ | ✅ | ❌ |
 | Configurable base device & breakpoints | ✅ `ResponsiveProvider` | ⚠️ build-time env | ❌ |
@@ -156,8 +156,10 @@ All four accept `50` or `'50%'`.
 
 ### Fonts
 
-- `fontSize(size)` — scales with the device's shorter edge **and** respects the user's OS text-size setting via `useWindowDimensions().fontScale`. Device scaling is clamped to 0.85×–1.3× so tablets don't get oversized body text, and the accessibility scale is capped at 2×.
-- `ms(size, factor = 0.5)` — moderate scale: moves `factor` of the way from `size` towards full linear scaling with the shorter edge. `ms(16)` is 16 on the 375dp baseline and ~24.5 on a 768dp tablet. Same formula as `moderateScale` from react-native-size-matters, but against a 375dp baseline (size-matters uses 350) and rounded to the nearest pixel, so values differ slightly; set `baseDevice: { width: 350, height: 680 }` on [`ResponsiveProvider`](#responsiveprovider) to match its baseline more closely.
+- `fontSize(size)` — scales with the device's shorter edge **and** applies the user's OS text-size setting (`useWindowDimensions().fontScale`) itself. Device scaling is clamped to 0.85×–1.3× so tablets don't get oversized body text, and the OS text scale is capped at 2×.
+
+  > **Use it with `<Text allowFontScaling={false}>`.** React Native's `<Text>` already multiplies `fontSize` by the OS text scale by default, so combining the two scales twice (a 1.5× setting becomes ~2.25×). Turning native scaling off lets `fontSize()` apply the OS scale once, with its 2× cap. If you prefer React Native's native scaling, use `s()` or `ms()` for font sizes instead and cap it with `maxFontSizeMultiplier`.
+- `ms(size, factor = 0.5)` — moderate scale: moves `factor` of the way from `size` towards full linear scaling with the shorter edge. `ms(16)` is 16 on the 375dp baseline and ~24.5 on a 768dp tablet. Same formula as `moderateScale` from react-native-size-matters, but against a 375dp baseline (size-matters uses 350) and rounded to the nearest pixel, so values differ slightly; set `baseDevice: { width: 350, height: 680 }` on [`ResponsiveProvider`](#responsiveprovider) to match its baseline more closely — note that `baseDevice` is shared, so this also shifts `fontSize`, `rem` and `ms` values.
 - `rem(size)` — scales linearly against a 375dp baseline, with no accessibility scaling.
 
 ### Scale helpers (react-native-size-matters style)
@@ -169,11 +171,11 @@ All four accept `50` or `'50%'`.
 | `ms(size, factor = 0.5)` | `moderateScale` / `ms` | halfway (by `factor`) towards `s` |
 | `mvs(size, factor = 0.5)` | `moderateVerticalScale` / `mvs` | halfway (by `factor`) towards `vs` |
 
-Unlike size-matters, these come from the hook, so they **update on rotation and window resize**. They scale against the base device (375 × 812 by default; size-matters uses 350 × 680 — set `baseDevice` on [`ResponsiveProvider`](#responsiveprovider) to match) and round to the nearest pixel.
+Unlike size-matters, these come from the hook, so they **update on rotation and window resize**. They scale against the base device (375 × 812 by default; size-matters uses 350 × 680 — set `baseDevice` on [`ResponsiveProvider`](#responsiveprovider) to match, but note that `baseDevice` is shared, so this also shifts `fontSize`, `rem` and `ms` values) and round to the nearest pixel.
 
 ### `createResponsiveStyles(factory)`
 
-Define styles once, outside the component, using any of the helpers. It returns a hook; the styles are rebuilt only when the window size, font scale or provider config changes — so they **follow rotation** — and otherwise keep the same identity between renders.
+Call it once **at module scope** (not inside a component), using any of the helpers. The factory should only read what it is given; values from props or context belong in inline styles, since styles rebuild only on layout changes. It returns a hook; the styles are rebuilt only when the window size, font scale or provider config changes — so they **follow rotation** — and otherwise keep the same identity between renders.
 
 ```tsx
 import { createResponsiveStyles } from 'react-native-responsive-hook';
@@ -197,7 +199,7 @@ It is fully typed: style values are checked against React Native's style types, 
 
 ### Platform & orientation
 
-`isIOS`, `isAndroid`, `isLandscape`, `isPortrait`, and `isTablet` — true when the shorter screen edge is at least 600dp (Android's `sw600dp` convention), so it doesn't flip on rotation.
+`isIOS`, `isAndroid`, `isLandscape`, `isPortrait`, and `isTablet` — true when the shorter edge of the **window** is at least 600dp (Android's `sw600dp` convention), so it doesn't flip on rotation. It follows the window, not the physical screen: it can change in iPad Split View or Android multi-window, and on the web it is true for any browser window at least 600dp on its shorter side.
 
 ### `ResponsiveProvider`
 
@@ -208,7 +210,7 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 
 <ResponsiveProvider
   config={{
-    baseDevice: { width: 390, height: 844 }, // what fontSize, rem and ms scale against
+    baseDevice: { width: 390, height: 844 }, // what fontSize, rem, s, vs, ms and mvs scale against
     breakpoints: { md: 640, lg: 1024 },      // minimum widths; omitted keys keep their defaults
   }}
 >

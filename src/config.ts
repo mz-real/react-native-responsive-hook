@@ -18,7 +18,7 @@ import {
 export type BaseDevice = { width: number; height: number };
 
 export type ResponsiveConfig = {
-  /** Design baseline that `fontSize`, `rem` and `ms` scale against. */
+  /** Design baseline that `fontSize`, `rem`, `s`, `vs`, `ms` and `mvs` scale against. */
   baseDevice?: BaseDevice;
   /** Minimum width in dp for each breakpoint. Omitted keys keep their defaults. */
   breakpoints?: Partial<BreakpointThresholds>;

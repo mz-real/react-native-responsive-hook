@@ -20,9 +20,10 @@ const toNumber = (value: Percent): number =>
 /** Bounds on how far `fontSize` scales with the device, so a tablet does not
  *  receive double-size body text. */
 const MIN_FONT_RATIO = 0.85;
+const MAX_FONT_RATIO = 1.3;
+
 /** Android's `sw600dp` resource qualifier: the conventional tablet cut-off. */
 const TABLET_MIN_SHORT_EDGE = 600;
-const MAX_FONT_RATIO = 1.3;
 
 export type UseResponsiveReturn = {
   isLandscape: boolean;
@@ -30,8 +31,9 @@ export type UseResponsiveReturn = {
   isIOS: boolean;
   isAndroid: boolean;
   /**
-   * The shorter screen edge is at least 600dp -- Android's `sw600dp` tablet
-   * qualifier. Orientation independent; large foldables unfolded count too.
+   * The shorter edge of the window is at least 600dp -- Android's `sw600dp`
+   * tablet qualifier. Orientation independent; follows the window, so it can
+   * change in split-screen / multi-window and applies to large web windows.
    */
   isTablet: boolean;
   /** Named breakpoint for the current width. */
