@@ -21,6 +21,22 @@ function Card() {
 }
 ```
 
+## See it in action
+
+The [example app](#example-app) as the window gets wider: the grid goes from one column (`xs`) to two (`lg`) to three (`xxl`), and every size follows along.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mz-real/react-native-responsive-hook/master/assets/readme/demo-resize.gif" alt="Example app resizing from one to three columns as the window widens" width="760">
+</p>
+
+The same app on an iPhone 16 (iOS Simulator). Rotating switches it from `xs` with one column to `lg` with two, and the grid stays clear of the Dynamic Island.
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mz-real/react-native-responsive-hook/master/assets/readme/ios-portrait.png" alt="Example app on iPhone 16 in portrait: xs breakpoint, one column" height="420">
+  &nbsp;&nbsp;
+  <img src="https://raw.githubusercontent.com/mz-real/react-native-responsive-hook/master/assets/readme/ios-landscape.png" alt="Example app on iPhone 16 in landscape: lg breakpoint, two columns" height="194">
+</p>
+
 ## How it compares
 
 | | react-native-responsive-hook | react-native-size-matters | react-native-responsive-screen |
