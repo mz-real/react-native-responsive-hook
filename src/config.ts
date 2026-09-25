@@ -17,16 +17,26 @@ import {
 
 export type BaseDevice = { width: number; height: number };
 
+/** A window size to assume while the real one is unknown (0x0). */
+export type InitialWindow = { width: number; height: number; fontScale?: number };
+
 export type ResponsiveConfig = {
   /** Design baseline that `fontSize`, `rem`, `s`, `vs`, `ms` and `mvs` scale against. */
   baseDevice?: BaseDevice;
   /** Minimum width in dp for each breakpoint. Omitted keys keep their defaults. */
   breakpoints?: Partial<BreakpointThresholds>;
+  /**
+   * Window size used while React Native reports a 0x0 window -- during
+   * server-side rendering on the web, and on some first renders. Ignored as
+   * soon as the real window has a size.
+   */
+  initialWindow?: InitialWindow;
 };
 
 export type ResolvedResponsiveConfig = {
   baseDevice: BaseDevice;
   breakpoints: BreakpointThresholds;
+  initialWindow?: Required<InitialWindow>;
 };
 
 const isPositiveFinite = (n: number) => Number.isFinite(n) && n > 0;
@@ -71,7 +81,21 @@ export function resolveConfig(config: ResponsiveConfig = {}): ResolvedResponsive
     }
   }
 
-  return { baseDevice, breakpoints };
+  if (config.initialWindow === undefined) {
+    return { baseDevice, breakpoints };
+  }
+
+  const initialWindow = { fontScale: 1, ...definedOnly(config.initialWindow) } as Required<InitialWindow>;
+  if (
+    !isPositiveFinite(initialWindow.width) ||
+    !isPositiveFinite(initialWindow.height) ||
+    !isPositiveFinite(initialWindow.fontScale)
+  ) {
+    throw new Error(
+      `react-native-responsive-hook: initialWindow width, height and fontScale must be positive numbers, got ${initialWindow.width}×${initialWindow.height} @ ${initialWindow.fontScale}.`
+    );
+  }
+  return { baseDevice, breakpoints, initialWindow };
 }
 
 const ResponsiveContext = createContext<ResolvedResponsiveConfig>(resolveConfig());
@@ -88,7 +112,7 @@ export function ResponsiveProvider({
   config?: ResponsiveConfig;
   children?: ReactNode;
 }): ReactElement {
-  const { baseDevice, breakpoints } = config ?? {};
+  const { baseDevice, breakpoints, initialWindow } = config ?? {};
   // Keyed on primitives so an inline `config={{ ... }}` does not produce a
   // new context value -- and invalidate every consumer's memo -- each render.
   const value = useMemo(
@@ -101,6 +125,9 @@ export function ResponsiveProvider({
       breakpoints?.lg,
       breakpoints?.xl,
       breakpoints?.xxl,
+      initialWindow?.width,
+      initialWindow?.height,
+      initialWindow?.fontScale,
     ]
   );
   return createElement(ResponsiveContext.Provider, { value }, children);

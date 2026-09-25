@@ -222,6 +222,7 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 - Thresholds must be positive and strictly ascending (`sm < md < lg < xl < xxl`), otherwise the provider throws an error naming the offending keys. If you raise one threshold past the next default (e.g. `sm: 700` while `md` is still 600), set the keys above it too.
 - Passing an inline object is fine — the hook's memoized values stay stable across re-renders as long as the numbers don't change.
 - A nested provider resolves its config against the defaults, not against its parent.
+- `initialWindow: { width, height, fontScale? }` is used while React Native reports a 0×0 window — during server-side rendering on the web (Expo Router, Next.js with react-native-web) and on some first renders — so the server renders the same breakpoint and sizes you expect on the client instead of `xs` and zeros. It is ignored as soon as the real window has a size. Pick the size your most common client uses, e.g. `{ width: 1280, height: 800 }` for a desktop-first web app.
 - The deprecated module-level exports (`widthPercentageToDP`, the `breakpointGroup` constant, …) have no access to React context and ignore the provider.
 
 ## Migrating from 1.0.x
