@@ -27,11 +27,11 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ inputs.ref }}
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           # Trusted publishing needs npm >= 11.5.1, bundled with Node 24.
           node-version: 24
@@ -39,12 +39,26 @@ jobs:
 
       - run: npm ci
 
+      - name: Refuse to republish an existing version
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if npm view "react-native-responsive-hook@$version" version >/dev/null 2>&1; then
+            echo "::error::react-native-responsive-hook@$version is already on npm; bump the version first."
+            exit 1
+          fi
+
       - name: Typecheck
         if: ${{ hashFiles('tsconfig.json') != '' }}
         run: npm run typecheck
 
       - name: Test
         run: npm test -- --ci
+
+      - name: Build and check package
+        if: ${{ hashFiles('tsconfig.json') != '' }}
+        run: |
+          npm run build
+          npm run lint:package
 
       - name: Publish
         run: npm publish --provenance --access public --tag "${{ inputs.dist-tag }}"
