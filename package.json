@@ -1,6 +1,6 @@
 {
   "name": "react-native-responsive-hook",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "license": "MIT",
   "description": "Responsive React Native hooks: breakpoints, select(), accessible font scaling, wp/hp and moderate scale that update on rotation. TypeScript, Expo and web ready.",
   "main": "./lib/commonjs/index.js",
