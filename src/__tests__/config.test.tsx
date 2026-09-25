@@ -164,6 +164,45 @@ describe('resolveConfig defaults', () => {
   });
 });
 
+describe('invalid provider config', () => {
+  const g = global as { __DEV__?: boolean };
+  const invalid = { breakpoints: { md: 900 } };
+  let error: jest.SpyInstance;
+
+  beforeEach(() => {
+    error = jest.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  afterEach(() => {
+    error.mockRestore();
+    delete g.__DEV__;
+  });
+
+  it('throws in development so the mistake is seen', () => {
+    g.__DEV__ = true;
+    expect(() => renderWithConfig(() => invalid)).toThrow(/ascending/);
+  });
+
+  it('falls back to the defaults in production instead of crashing', () => {
+    g.__DEV__ = false;
+    rn.__state.width = 700;
+    const hook = renderWithConfig(() => invalid);
+    expect(hook.current.breakpoint).toBe('md');
+    expect(error).toHaveBeenCalledWith(expect.stringMatching(/ascending.*Using the defaults/));
+  });
+
+  it('treats NODE_ENV=production as production when __DEV__ is not defined', () => {
+    const previous = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    try {
+      rn.__state.width = 700;
+      expect(renderWithConfig(() => invalid).current.breakpoint).toBe('md');
+    } finally {
+      process.env.NODE_ENV = previous;
+    }
+  });
+});
+
 describe('resolveConfig validation', () => {
   it('rejects thresholds that are not strictly ascending', () => {
     expect(() => resolveConfig({ breakpoints: { md: 900 } })).toThrow(

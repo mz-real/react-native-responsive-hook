@@ -219,7 +219,7 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 ```
 
 - Without a provider, the defaults above apply, exactly as before.
-- Thresholds must be positive and strictly ascending (`sm < md < lg < xl < xxl`), otherwise the provider throws an error naming the offending keys. If you raise one threshold past the next default (e.g. `sm: 700` while `md` is still 600), set the keys above it too.
+- Thresholds must be positive and strictly ascending (`sm < md < lg < xl < xxl`). An invalid config throws an error naming the offending keys **in development**; in production (`__DEV__` false, or `NODE_ENV=production` where `__DEV__` is not defined) it logs that error with `console.error` and falls back to the defaults, so a bad config never crashes a user's app. If you raise one threshold past the next default (e.g. `sm: 700` while `md` is still 600), set the keys above it too.
 - Passing an inline object is fine — the hook's memoized values stay stable across re-renders as long as the numbers don't change.
 - A nested provider resolves its config against the defaults, not against its parent.
 - `initialWindow: { width, height, fontScale? }` is used while React Native reports an unmeasured 0×0 window — during server-side rendering on the web (Expo Router, Next.js with react-native-web) and in rare native first renders — instead of rendering with `xs` and zeros. It is ignored as soon as the real window has a size, and its `fontScale` defaults to 1. It only avoids a hydration mismatch for clients whose window matches it: react-native-web measures the real window on the client's first render, so for other sizes, render size-dependent UI after mount (or use CSS media queries) if you need an exact match.

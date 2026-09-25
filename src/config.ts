@@ -41,6 +41,17 @@ export type ResolvedResponsiveConfig = {
   initialWindow?: Required<InitialWindow>;
 };
 
+declare const __DEV__: boolean | undefined;
+declare const process: { env: { NODE_ENV?: string } } | undefined;
+
+/** React Native's `__DEV__` when defined; otherwise `NODE_ENV` (web). */
+function isDevelopment(): boolean {
+  if (typeof __DEV__ !== 'undefined') {
+    return Boolean(__DEV__);
+  }
+  return typeof process === 'undefined' || process.env.NODE_ENV !== 'production';
+}
+
 const isPositiveFinite = (n: number) => Number.isFinite(n) && n > 0;
 
 /** Drops keys whose value is `undefined`, so `{ md: undefined }` keeps the
@@ -100,7 +111,9 @@ export function resolveConfig(config: ResponsiveConfig = {}): ResolvedResponsive
   return { baseDevice, breakpoints, initialWindow };
 }
 
-const ResponsiveContext = createContext<ResolvedResponsiveConfig>(resolveConfig());
+const DEFAULT_CONFIG = resolveConfig();
+
+const ResponsiveContext = createContext<ResolvedResponsiveConfig>(DEFAULT_CONFIG);
 
 /**
  * Overrides the base device and/or breakpoint thresholds for every
@@ -118,7 +131,19 @@ export function ResponsiveProvider({
   // Keyed on primitives so an inline `config={{ ... }}` does not produce a
   // new context value -- and invalidate every consumer's memo -- each render.
   const value = useMemo(
-    () => resolveConfig(config),
+    () => {
+      try {
+        return resolveConfig(config);
+      } catch (error) {
+        // Surface the mistake in development; never crash a user's app over
+        // it in production -- fall back to the defaults instead.
+        if (isDevelopment()) {
+          throw error;
+        }
+        console.error(`${(error as Error).message} Using the defaults instead.`);
+        return DEFAULT_CONFIG;
+      }
+    },
     [
       baseDevice?.width,
       baseDevice?.height,
