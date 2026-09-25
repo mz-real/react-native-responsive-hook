@@ -1,6 +1,12 @@
+import { StrictMode } from 'react';
 import TestRenderer, { act } from 'react-test-renderer';
 
-import { ResponsiveProvider, resolveConfig, type ResponsiveConfig } from '../config';
+import {
+  ResponsiveProvider,
+  __resetHydrationForTests,
+  resolveConfig,
+  type ResponsiveConfig,
+} from '../config';
 import { useResponsive, type UseResponsiveReturn } from '../useResponsive';
 
 const rn = require('../../test/reactNativeStub.js');
@@ -150,18 +156,28 @@ describe('initialWindow (SSR / first render)', () => {
 });
 
 describe('ssr mode', () => {
-  function renders(config: ResponsiveConfig) {
+  beforeEach(() => {
+    __resetHydrationForTests();
+    rn.__state.platform = 'web';
+  });
+
+  afterEach(() => {
+    rn.__state.platform = 'ios';
+  });
+
+  function renders(config: ResponsiveConfig, strict = false) {
     const seen: string[] = [];
     function Probe() {
       seen.push(useResponsive().breakpoint);
       return null;
     }
+    const tree = (
+      <ResponsiveProvider config={config}>
+        <Probe />
+      </ResponsiveProvider>
+    );
     act(() => {
-      TestRenderer.create(
-        <ResponsiveProvider config={config}>
-          <Probe />
-        </ResponsiveProvider>
-      );
+      TestRenderer.create(strict ? <StrictMode>{tree}</StrictMode> : tree);
     });
     return seen;
   }
@@ -183,6 +199,39 @@ describe('ssr mode', () => {
 
   it('requires an initialWindow', () => {
     expect(() => resolveConfig({ ssr: true })).toThrow(/ssr.*initialWindow/);
+  });
+
+  const ssrConfig = { ssr: true, initialWindow: { width: 1280, height: 800 } };
+
+  it('does not repeat initialWindow for providers mounted after hydration', () => {
+    renders(ssrConfig);
+    // e.g. a screen or modal mounted during client-side navigation
+    expect(renders(ssrConfig)).toEqual(['xs']);
+  });
+
+  it('is ignored on native, where there is no server HTML to match', () => {
+    rn.__state.platform = 'ios';
+    expect(renders(ssrConfig)).toEqual(['xs']);
+  });
+
+  it('settles on the real window under StrictMode', () => {
+    const seen = renders(ssrConfig, true);
+    expect(seen[0]).toBe('xxl');
+    expect(seen[seen.length - 1]).toBe('xs');
+  });
+
+  it('in production, drops only an invalid ssr flag and keeps the rest of the config', () => {
+    const g = global as { __DEV__?: boolean };
+    g.__DEV__ = false;
+    const error = jest.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      rn.__state.width = 550;
+      expect(renders({ ssr: true, breakpoints: { md: 500 } })).toEqual(['md']);
+      expect(error).toHaveBeenCalledWith(expect.stringMatching(/ssr/));
+    } finally {
+      error.mockRestore();
+      delete g.__DEV__;
+    }
   });
 });
 
