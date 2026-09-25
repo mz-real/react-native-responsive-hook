@@ -83,14 +83,15 @@ export type UseResponsiveReturn = {
  */
 export function useResponsive(): UseResponsiveReturn {
   const windowDimensions = useWindowDimensions();
-  const { baseDevice, breakpoints, initialWindow } = useResponsiveConfig();
+  const { baseDevice, breakpoints, initialWindow, hydrating } = useResponsiveConfig();
   // While the window is unmeasured (0x0: server rendering on the web, rare
   // native first renders), fall back to the provider's initialWindow.
   const unmeasured = windowDimensions.width === 0 && windowDimensions.height === 0;
   // MockWindowProvider (react-native-responsive-hook/testing) wins outright.
   const override = useContext(WindowOverrideContext);
   const { width, height, fontScale } =
-    override ?? (unmeasured && initialWindow ? initialWindow : windowDimensions);
+    override ??
+    ((unmeasured || hydrating) && initialWindow ? initialWindow : windowDimensions);
 
   return useMemo<UseResponsiveReturn>(() => {
     const isLandscape = width > height;
