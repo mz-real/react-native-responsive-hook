@@ -97,6 +97,51 @@ describe('ResponsiveProvider', () => {
   });
 });
 
+describe('initialWindow (SSR / first render)', () => {
+  const initialWindow = { width: 1024, height: 768 };
+
+  it('is used while the real window reports 0x0', () => {
+    rn.__state.width = 0;
+    rn.__state.height = 0;
+    const hook = renderWithConfig(() => ({ initialWindow }));
+    expect(hook.current.breakpoint).toBe('xl');
+    expect(hook.current.wp(50)).toBe(512);
+    expect(hook.current.isLandscape).toBe(true);
+  });
+
+  it('is ignored once the real window has a size', () => {
+    rn.__state.width = 375;
+    rn.__state.height = 812;
+    const hook = renderWithConfig(() => ({ initialWindow }));
+    expect(hook.current.breakpoint).toBe('xs');
+    expect(hook.current.wp(50)).toBe(187.5);
+  });
+
+  it('defaults its font scale to 1', () => {
+    rn.__state.width = 0;
+    rn.__state.height = 0;
+    rn.__state.fontScale = 3;
+    const hook = renderWithConfig(() => ({ initialWindow: { width: 375, height: 812 } }));
+    expect(hook.current.fontSize(16)).toBe(16);
+  });
+
+  it('keeps the historical 0x0 behaviour without an initialWindow', () => {
+    rn.__state.width = 0;
+    rn.__state.height = 0;
+    const hook = renderWithConfig(() => undefined);
+    expect(hook.current.breakpoint).toBe('xs');
+    expect(hook.current.wp(50)).toBe(0);
+  });
+
+  it.each([
+    [{ width: 0, height: 768 }],
+    [{ width: 1024, height: NaN }],
+    [{ width: 1024, height: 768, fontScale: -1 }],
+  ])('rejects invalid initialWindow %p', (bad) => {
+    expect(() => resolveConfig({ initialWindow: bad })).toThrow(/initialWindow/);
+  });
+});
+
 describe('resolveConfig defaults', () => {
   it('treats explicitly undefined keys as omitted', () => {
     // e.g. `breakpoints: { md: isTablet ? 700 : undefined }`

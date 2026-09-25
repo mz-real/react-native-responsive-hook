@@ -83,8 +83,13 @@ export type UseResponsiveReturn = {
  * render.
  */
 export function useResponsive(): UseResponsiveReturn {
-  const { width, height, fontScale } = useWindowDimensions();
-  const { baseDevice, breakpoints } = useResponsiveConfig();
+  const window = useWindowDimensions();
+  const { baseDevice, breakpoints, initialWindow } = useResponsiveConfig();
+  // Until the real window has a size (SSR on the web, some first renders),
+  // fall back to the provider's initialWindow when one is configured.
+  const hasSize = window.width > 0 && window.height > 0;
+  const { width, height, fontScale } =
+    !hasSize && initialWindow ? initialWindow : window;
 
   return useMemo<UseResponsiveReturn>(() => {
     const isLandscape = width > height;
