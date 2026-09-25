@@ -53,3 +53,35 @@ jobs:
 
       - name: Type-check consumer against React Native 0.81 (default + strict API)
         run: npm run test:types-compat
+
+  example:
+    # The Expo example must keep type-checking and bundling against lib/.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            example/package-lock.json
+
+      - run: npm ci
+
+      - name: Install example
+        working-directory: example
+        run: npm ci
+
+      - name: Type-check example
+        working-directory: example
+        run: npx tsc --noEmit
+
+      - name: Bundle example for web and Android
+        working-directory: example
+        env:
+          CI: 1
+        run: |
+          npx expo export --platform web --output-dir dist/web
+          npx expo export --platform android --output-dir dist/android
