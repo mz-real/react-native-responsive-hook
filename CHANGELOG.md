@@ -4,6 +4,11 @@ All notable changes to this package. Versions follow [Semantic Versioning](https
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-09-25
+
+### Docs
+- README rewritten in plainer language. No code changes.
+
 ## [1.6.0] - 2026-09-25
 
 ### Added
@@ -125,7 +130,8 @@ Hotfix for 1.0.x. No API changes.
 - **Fixed `removeOrientationListener()`.** It called `Dimensions.removeEventListener`, which was removed in RN 0.72, so it threw a `TypeError`. It also never removed the handler that had been registered. It now keeps the subscription and calls `.remove()` on it.
 - **Smaller package.** The bundled Expo example apps are no longer published: 33 files / 802 kB went down to 8 files / 25.7 kB.
 
-[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.6.1...HEAD
+[1.6.1]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.1
 [1.6.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.0
 [1.5.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.5.0
 [1.4.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.4.0
