@@ -1,0 +1,31 @@
+name: Bug report
+description: Something in react-native-responsive-hook does not work as documented
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Minimal reproduction
+      description: The smallest snippet (or Snack link) that shows the problem, including the screen size if relevant.
+      render: tsx
+    validations:
+      required: true
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      placeholder: react-native-responsive-hook 1.x, react-native 0.xx, react 18/19, Expo SDK xx
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      multiple: true
+      options: [iOS, Android, Web, Other]
