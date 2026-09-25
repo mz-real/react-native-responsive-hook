@@ -1,6 +1,7 @@
 import { Dimensions, PixelRatio, Platform, type ScaledSize } from 'react-native';
 
 import { baseDevice, baseFontSize, maxFontScaleFactor } from './constants.js';
+import { toNumber } from './toNumber.js';
 import { resolveBreakpoint, LEGACY_GROUP_BY_BREAKPOINT } from './breakpoints.js';
 import { useResponsive } from './useResponsive.js';
 
@@ -51,9 +52,6 @@ let base = Math.min(screenWidth, screenHeight);
  *  `breakpoint` -- from `useResponsive()`. */
 export const breakpointGroup =
   LEGACY_GROUP_BY_BREAKPOINT[resolveBreakpoint(screenWidth)];
-
-const toNumber = (value: number | string): number =>
-  typeof value === 'number' ? value : parseFloat(value);
 
 /** @deprecated Use `wp` from `useResponsive()`. */
 export const widthPercentageToDP = (widthPercent: number | string): number =>
