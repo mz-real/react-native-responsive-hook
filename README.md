@@ -151,6 +151,30 @@ All four accept `50` or `'50%'`.
 
 Unlike size-matters, these come from the hook, so they **update on rotation and window resize**. They scale against the base device (375 × 812 by default; size-matters uses 350 × 680 — set `baseDevice` on [`ResponsiveProvider`](#responsiveprovider) to match) and round to the nearest pixel.
 
+### `createResponsiveStyles(factory)`
+
+Define styles once, outside the component, using any of the helpers. It returns a hook; the styles are rebuilt only when the window size, font scale or provider config changes — so they **follow rotation** — and otherwise keep the same identity between renders.
+
+```tsx
+import { createResponsiveStyles } from 'react-native-responsive-hook';
+
+const useStyles = createResponsiveStyles(({ wp, s, select, fontSize }) => ({
+  card: {
+    width: wp(90),
+    padding: s(12),
+    flexDirection: select({ xs: 'column', md: 'row', default: 'column' }),
+  },
+  title: { fontSize: fontSize(18) },
+}));
+
+function Card() {
+  const styles = useStyles();
+  return <View style={styles.card}>…</View>;
+}
+```
+
+It is fully typed: style values are checked against React Native's style types, with no casts needed.
+
 ### Platform & orientation
 
 `isIOS`, `isAndroid`, `isLandscape`, `isPortrait`.

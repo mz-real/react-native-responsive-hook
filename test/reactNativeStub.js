@@ -44,6 +44,11 @@ Object.defineProperty(Dimensions, 'removeEventListener', {
 module.exports = {
   __state: state,
   Dimensions,
+  StyleSheet: {
+    // Real StyleSheet.create returns the same object shape; tests assert on
+    // the values, so identity passthrough is enough.
+    create: (styles) => styles,
+  },
   PixelRatio: {
     roundToNearestPixel: (n) => Math.round(n * 2) / 2,
     getFontScale: () => state.fontScale,

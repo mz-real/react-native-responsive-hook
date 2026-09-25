@@ -27,3 +27,29 @@ it('type assertions compile', () => {
   expect(withoutDefault).toBe(12);
   expect(mixed).toBe('auto');
 });
+
+// createResponsiveStyles keeps literal style values without casts, and
+// rejects invalid style properties.
+import { createResponsiveStyles } from '../styles';
+
+const useRowStyles = createResponsiveStyles(({ wp }) => ({
+  row: { flexDirection: 'row', width: wp(50) },
+}));
+type RowStyles = ReturnType<typeof useRowStyles>;
+assertType<Equals<RowStyles['row']['flexDirection'], 'row'>>(true);
+
+createResponsiveStyles(() => ({
+  // @ts-expect-error -- not a valid flexDirection
+  bad: { flexDirection: 'diagonal' },
+}));
+
+// The README example: select() inside a style infers the literal union from
+// the style's contextual type.
+createResponsiveStyles(({ wp, s, select, fontSize }) => ({
+  card: {
+    width: wp(90),
+    padding: s(12),
+    flexDirection: select({ xs: 'column', md: 'row', default: 'column' }),
+  },
+  title: { fontSize: fontSize(18) },
+}));
