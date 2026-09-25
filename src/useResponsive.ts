@@ -20,6 +20,8 @@ const toNumber = (value: Percent): number =>
 /** Bounds on how far `fontSize` scales with the device, so a tablet does not
  *  receive double-size body text. */
 const MIN_FONT_RATIO = 0.85;
+/** Android's `sw600dp` resource qualifier: the conventional tablet cut-off. */
+const TABLET_MIN_SHORT_EDGE = 600;
 const MAX_FONT_RATIO = 1.3;
 
 export type UseResponsiveReturn = {
@@ -27,6 +29,11 @@ export type UseResponsiveReturn = {
   isPortrait: boolean;
   isIOS: boolean;
   isAndroid: boolean;
+  /**
+   * The shorter screen edge is at least 600dp -- Android's `sw600dp` tablet
+   * qualifier. Orientation independent; large foldables unfolded count too.
+   */
+  isTablet: boolean;
   /** Named breakpoint for the current width. */
   breakpoint: Breakpoint;
   /** Mobile-first value picker keyed on the current breakpoint. */
@@ -135,6 +142,7 @@ export function useResponsive(): UseResponsiveReturn {
       isPortrait,
       isIOS: Platform.OS === 'ios',
       isAndroid: Platform.OS === 'android',
+      isTablet: base >= TABLET_MIN_SHORT_EDGE,
 
       breakpoint,
       select: createSelect(breakpoint),

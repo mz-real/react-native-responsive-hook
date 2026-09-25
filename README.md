@@ -177,7 +177,7 @@ It is fully typed: style values are checked against React Native's style types, 
 
 ### Platform & orientation
 
-`isIOS`, `isAndroid`, `isLandscape`, `isPortrait`.
+`isIOS`, `isAndroid`, `isLandscape`, `isPortrait`, and `isTablet` — true when the shorter screen edge is at least 600dp (Android's `sw600dp` convention), so it doesn't flip on rotation.
 
 ### `ResponsiveProvider`
 
