@@ -149,6 +149,43 @@ describe('initialWindow (SSR / first render)', () => {
   });
 });
 
+describe('ssr mode', () => {
+  function renders(config: ResponsiveConfig) {
+    const seen: string[] = [];
+    function Probe() {
+      seen.push(useResponsive().breakpoint);
+      return null;
+    }
+    act(() => {
+      TestRenderer.create(
+        <ResponsiveProvider config={config}>
+          <Probe />
+        </ResponsiveProvider>
+      );
+    });
+    return seen;
+  }
+
+  it('renders with initialWindow first, then the real window after mount', () => {
+    rn.__state.width = 375;
+    rn.__state.height = 812;
+    expect(renders({ ssr: true, initialWindow: { width: 1280, height: 800 } })).toEqual([
+      'xxl',
+      'xs',
+    ]);
+  });
+
+  it('renders the real window immediately without ssr', () => {
+    rn.__state.width = 375;
+    rn.__state.height = 812;
+    expect(renders({ initialWindow: { width: 1280, height: 800 } })).toEqual(['xs']);
+  });
+
+  it('requires an initialWindow', () => {
+    expect(() => resolveConfig({ ssr: true })).toThrow(/ssr.*initialWindow/);
+  });
+});
+
 describe('resolveConfig defaults', () => {
   it('treats explicitly undefined keys as omitted', () => {
     // e.g. `breakpoints: { md: isTablet ? 700 : undefined }`

@@ -2,7 +2,9 @@ import {
   createContext,
   createElement,
   useContext,
+  useEffect,
   useMemo,
+  useState,
   type ReactElement,
   type ReactNode,
 } from 'react';
@@ -33,12 +35,22 @@ export type ResponsiveConfig = {
    * render.
    */
   initialWindow?: InitialWindow;
+  /**
+   * Render with `initialWindow` until the provider has mounted, then switch
+   * to the real window. Makes the server HTML and the client's first render
+   * identical (no hydration mismatch) at the cost of one extra render after
+   * mount. Requires `initialWindow`.
+   */
+  ssr?: boolean;
 };
 
 export type ResolvedResponsiveConfig = {
   baseDevice: BaseDevice;
   breakpoints: BreakpointThresholds;
   initialWindow?: Required<InitialWindow>;
+  ssr?: true;
+  /** True only during the pre-mount render(s) of an `ssr` provider. */
+  hydrating?: true;
 };
 
 declare const __DEV__: boolean | undefined;
@@ -95,6 +107,11 @@ export function resolveConfig(config: ResponsiveConfig = {}): ResolvedResponsive
   }
 
   if (config.initialWindow === undefined) {
+    if (config.ssr) {
+      throw new Error(
+        'react-native-responsive-hook: ssr: true needs an initialWindow to render with before mount.'
+      );
+    }
     return { baseDevice, breakpoints };
   }
 
@@ -108,7 +125,9 @@ export function resolveConfig(config: ResponsiveConfig = {}): ResolvedResponsive
       `react-native-responsive-hook: initialWindow width, height and fontScale must be positive numbers, got ${initialWindow.width}×${initialWindow.height} @ ${initialWindow.fontScale}.`
     );
   }
-  return { baseDevice, breakpoints, initialWindow };
+  return config.ssr
+    ? { baseDevice, breakpoints, initialWindow, ssr: true }
+    : { baseDevice, breakpoints, initialWindow };
 }
 
 const DEFAULT_CONFIG = resolveConfig();
@@ -127,7 +146,7 @@ export function ResponsiveProvider({
   config?: ResponsiveConfig;
   children?: ReactNode;
 }): ReactElement {
-  const { baseDevice, breakpoints, initialWindow } = config ?? {};
+  const { baseDevice, breakpoints, initialWindow, ssr } = config ?? {};
   // Keyed on primitives so an inline `config={{ ... }}` does not produce a
   // new context value -- and invalidate every consumer's memo -- each render.
   const value = useMemo(
@@ -155,9 +174,26 @@ export function ResponsiveProvider({
       initialWindow?.width,
       initialWindow?.height,
       initialWindow?.fontScale,
+      ssr,
     ]
   );
-  return createElement(ResponsiveContext.Provider, { value }, children);
+
+  // With `ssr`, keep rendering initialWindow until mounted so the first
+  // client render matches the server HTML, then switch to the real window.
+  const [mounted, setMounted] = useState(false);
+  const ssrEnabled = value.ssr === true;
+  useEffect(() => {
+    if (ssrEnabled) {
+      setMounted(true);
+    }
+  }, [ssrEnabled]);
+  const hydrating = ssrEnabled && !mounted;
+  const contextValue = useMemo(
+    () => (hydrating ? { ...value, hydrating: true as const } : value),
+    [value, hydrating]
+  );
+
+  return createElement(ResponsiveContext.Provider, { value: contextValue }, children);
 }
 
 export function useResponsiveConfig(): ResolvedResponsiveConfig {
