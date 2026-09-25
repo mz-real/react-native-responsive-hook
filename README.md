@@ -28,8 +28,14 @@ Written in TypeScript, shipped as both ESM and CommonJS, with generated type def
 ## Installation
 
 ```bash
-npm install react-native-responsive-hook --save
+npm install react-native-responsive-hook
+# or
+yarn add react-native-responsive-hook
+# or, in an Expo project
+npx expo install react-native-responsive-hook
 ```
+
+Pure JavaScript: no native code, no linking, works in Expo Go and with the New Architecture.
 
 ## Usage
 
@@ -83,7 +89,7 @@ const useStyles = () => {
 export default App;
 ```
 
-Everything the hook returns is memoized against width, height, and font scale, so you can pass these functions to `useMemo` dependencies or `React.memo` children without causing extra renders.
+Everything the hook returns is memoized against width, height, font scale and the [`ResponsiveProvider`](#responsiveprovider) config, so you can pass these functions to `useMemo` dependencies or `React.memo` children without causing extra renders.
 
 ## API
 
@@ -93,11 +99,11 @@ Everything the hook returns is memoized against width, height, and font scale, s
 
 | Name  | Width (dp)  |
 |-------|-------------|
-| `xs`  | 0 – 399     |
-| `sm`  | 400 – 599   |
-| `md`  | 600 – 767   |
-| `lg`  | 768 – 1007  |
-| `xl`  | 1008 – 1279 |
+| `xs`  | below 400   |
+| `sm`  | 400 – <600  |
+| `md`  | 600 – <768  |
+| `lg`  | 768 – <1008 |
+| `xl`  | 1008 – <1280|
 | `xxl` | 1280 +      |
 
 Each breakpoint starts at its minimum width, so fractional widths (common on Android, e.g. `399.5`) fall into the lower breakpoint. The thresholds can be changed with [`ResponsiveProvider`](#responsiveprovider).
@@ -130,7 +136,7 @@ All four accept `50` or `'50%'`.
 
 ### Fonts
 
-- `fontSize(size)` — scales with the device's shorter edge **and** respects the user's OS text-size setting via `PixelRatio.getFontScale()`. Device scaling is clamped to 0.85×–1.3× so tablets don't get oversized body text, and the accessibility scale is capped at 2×.
+- `fontSize(size)` — scales with the device's shorter edge **and** respects the user's OS text-size setting via `useWindowDimensions().fontScale`. Device scaling is clamped to 0.85×–1.3× so tablets don't get oversized body text, and the accessibility scale is capped at 2×.
 - `ms(size, factor = 0.5)` — moderate scale: moves `factor` of the way from `size` towards full linear scaling with the shorter edge. `ms(16)` is 16 on the 375dp baseline and ~24.5 on a 768dp tablet. Same formula as `moderateScale` from react-native-size-matters, but against a 375dp baseline (size-matters uses 350) and rounded to the nearest pixel, so values differ slightly; set `baseDevice: { width: 350, height: 680 }` on [`ResponsiveProvider`](#responsiveprovider) to match its baseline more closely.
 - `rem(size)` — scales linearly against a 375dp baseline, with no accessibility scaling.
 
@@ -156,14 +162,14 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 ```
 
 - Without a provider, the defaults above apply, exactly as before.
-- Thresholds must be positive and strictly ascending (`sm < md < lg < xl < xxl`), otherwise the provider throws an error naming the offending keys.
+- Thresholds must be positive and strictly ascending (`sm < md < lg < xl < xxl`), otherwise the provider throws an error naming the offending keys. If you raise one threshold past the next default (e.g. `sm: 700` while `md` is still 600), set the keys above it too.
 - Passing an inline object is fine — the hook's memoized values stay stable across re-renders as long as the numbers don't change.
 - A nested provider resolves its config against the defaults, not against its parent.
 - The deprecated module-level exports (`widthPercentageToDP`, the `breakpointGroup` constant, …) have no access to React context and ignore the provider.
 
 ## Migrating from 1.0.x
 
-**1.1.0 is backwards compatible.** Nothing is removed, and no existing function changed its output. The items below are deprecated and still work.
+**1.1.0 and later are backwards compatible.** Nothing is removed, and no existing function changed its output (apart from the bug fixes listed below). The items below are deprecated and still work.
 
 | Deprecated | Use instead | Notes |
 |---|---|---|
@@ -177,14 +183,14 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 
 ### Fixed in 1.2.0
 
-- **Fractional widths resolve correctly.** A width between two whole-number ranges (e.g. `399.5`dp, which Android can report) used to fall through to `xxl`; it now resolves to the lower breakpoint (`xs`).
+- **Fractional widths resolve correctly.** A width between two whole-number ranges (e.g. `399.5`dp, which Android can report) used to fall through to `xxl`; it now resolves to the lower breakpoint (`xs`). A `NaN` width likewise resolves to `xs` instead of `xxl`.
 
 ### Fixed in 1.0.5 / 1.1.0
 
 - **The package no longer crashes on import.** 1.0.4 read `isLandscape` before it was declared, which threw `ReferenceError: Cannot access 'isLandscape' before initialization` under Hermes.
 - **`removeOrientationListener` works.** It called `Dimensions.removeEventListener`, removed in React Native 0.72, and even before that passed a throwaway function that removed nothing.
 - **`breakpointGroup` no longer returns `undefined`** above 8192dp.
-- **The published package shrank** from 802 kB to ~78 kB by no longer shipping three example apps.
+- **The published package shrank** from 802 kB to about 25 kB (packed) by no longer shipping three example apps.
 
 ## Want to Contribute?
 

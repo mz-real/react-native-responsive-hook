@@ -1,15 +1,15 @@
 import { useMemo } from 'react';
 import { PixelRatio, Platform, useWindowDimensions } from 'react-native';
 
-import { baseFontSize, maxFontScaleFactor } from './constants';
-import { useResponsiveConfig } from './config';
+import { baseFontSize, maxFontScaleFactor } from './constants.js';
+import { useResponsiveConfig } from './config.js';
 import {
   createSelect,
   resolveBreakpoint,
   LEGACY_GROUP_BY_BREAKPOINT,
   type Breakpoint,
   type Select,
-} from './breakpoints';
+} from './breakpoints.js';
 
 /** Accepts either `50` or `'50%'`. */
 export type Percent = number | string;
