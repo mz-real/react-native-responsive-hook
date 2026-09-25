@@ -54,7 +54,7 @@ It's plain JavaScript with no native code, so it works in Expo Go, on the New Ar
 
 You need React 16.8+ and React Native 0.61+, since the hook is built on `useWindowDimensions`.
 
-For a longer introduction, see [Creating responsive UIs in React Native made easy](https://medium.com/@mz-real/creating-responsive-uis-in-react-native-made-easy-with-react-native-responsive-hook-35fa5649cd5f).
+For a longer walkthrough with examples, see my article [Creating Responsive UIs in React Native Made Easy](https://medium.com/@mz-real/creating-responsive-uis-in-react-native-made-easy-with-react-native-responsive-hook-35fa5649cd5f) on Medium.
 
 ## Example app
 
