@@ -32,6 +32,8 @@ it('type assertions compile', () => {
 // rejects invalid style properties.
 import { createResponsiveStyles } from '../styles';
 
+// Only its type is used below.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const useRowStyles = createResponsiveStyles(({ wp }) => ({
   row: { flexDirection: 'row', width: wp(50) },
 }));

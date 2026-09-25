@@ -122,6 +122,18 @@ describe('orientation listener lifecycle', () => {
     expect(rn.__state.listeners).toHaveLength(0);
   });
 
+  it('does not throw when there is neither a subscription nor removeEventListener', () => {
+    const pkg = loadWith(375, 812);
+    const original = rn.Dimensions.addEventListener;
+    rn.Dimensions.addEventListener = () => undefined;
+    try {
+      pkg.listenOrientationChange({ setState: () => {} });
+      expect(() => pkg.removeOrientationListener()).not.toThrow();
+    } finally {
+      rn.Dimensions.addEventListener = original;
+    }
+  });
+
   it('replaces rather than leaks a listener when called twice', () => {
     const pkg = loadWith(375, 812);
     pkg.listenOrientationChange({ setState: () => {} });
