@@ -9,6 +9,6 @@ module.exports = {
   testMatch: ['<rootDir>/src/__tests__/**/*.test.{ts,tsx}'],
   collectCoverageFrom: ['src/**/*.ts', '!src/__tests__/**'],
   coverageThreshold: {
-    global: { statements: 100, branches: 95, functions: 100, lines: 100 },
+    global: { statements: 100, branches: 100, functions: 100, lines: 100 },
   },
 };

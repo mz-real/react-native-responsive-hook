@@ -1,9 +1,16 @@
 import { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import {
+  StyleSheet,
+  type ImageStyle,
+  type TextStyle,
+  type ViewStyle,
+} from 'react-native';
 
 import { useResponsive, type UseResponsiveReturn } from './useResponsive.js';
 
-type NamedStyles<T> = StyleSheet.NamedStyles<T>;
+// Defined locally from the public style types: React Native's strict
+// TypeScript API (0.80+) has no `StyleSheet.NamedStyles`.
+type NamedStyles<T> = { [P in keyof T]: ViewStyle | TextStyle | ImageStyle };
 
 /**
  * Defines styles from the responsive helpers once, outside the component,
