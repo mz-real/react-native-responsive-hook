@@ -11,12 +11,12 @@ const CARDS = ['Breakpoints', 'select()', 'wp / hp', 's / vs / ms', 'fontSize', 
 
 // Defined once at module scope; rebuilt only when the window changes, so it
 // follows rotation and browser resizing.
-const useStyles = createResponsiveStyles(({ select, s, ms, fontSize, wp }) => {
+const useStyles = createResponsiveStyles(({ select, s, ms, fontSize }) => {
   const columns = select({ xs: 1, md: 2, xl: 3, default: 1 });
   const gap = s(12);
-  // Card width that fits `columns` cards per row inside the padded content.
-  const contentWidth = Math.min(wp(100), 1200) - gap * 2;
-  const cardWidth = (contentWidth - gap * (columns - 1)) / columns;
+  // Percentage width plus flexGrow, so `columns` cards fit per row whatever
+  // space is left after safe-area insets (e.g. the Dynamic Island in landscape).
+  const cardBasis = `${Math.floor(100 / columns) - 4}%` as const;
 
   return {
     screen: { flex: 1, backgroundColor: '#F4F6FA' },
@@ -33,7 +33,8 @@ const useStyles = createResponsiveStyles(({ select, s, ms, fontSize, wp }) => {
     statusItem: { color: '#F8FAFC', fontSize: fontSize(14), fontWeight: '600' },
     grid: { flexDirection: 'row', flexWrap: 'wrap', gap },
     card: {
-      width: cardWidth,
+      width: cardBasis,
+      flexGrow: 1,
       // ms() grows gently, so cards stay compact on tablets and desktops.
       minHeight: ms(88),
       padding: ms(16),
@@ -111,7 +112,7 @@ function Screen() {
                 {title}
               </Text>
               <Text style={styles.cardNote} allowFontScaling={false}>
-                Card {index + 1} — columns follow the breakpoint
+                Card {index + 1} · columns follow the breakpoint
               </Text>
             </View>
           ))}
