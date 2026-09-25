@@ -1,9 +1,10 @@
-import { useMemo } from 'react';
+import { useContext, useMemo } from 'react';
 import { PixelRatio, Platform, useWindowDimensions } from 'react-native';
 
 import { baseFontSize, maxFontScaleFactor } from './constants.js';
 import { toNumber } from './toNumber.js';
 import { useResponsiveConfig } from './config.js';
+import { WindowOverrideContext } from './windowOverride.js';
 import {
   createSelect,
   resolveBreakpoint,
@@ -86,8 +87,10 @@ export function useResponsive(): UseResponsiveReturn {
   // While the window is unmeasured (0x0: server rendering on the web, rare
   // native first renders), fall back to the provider's initialWindow.
   const unmeasured = windowDimensions.width === 0 && windowDimensions.height === 0;
+  // MockWindowProvider (react-native-responsive-hook/testing) wins outright.
+  const override = useContext(WindowOverrideContext);
   const { width, height, fontScale } =
-    unmeasured && initialWindow ? initialWindow : windowDimensions;
+    override ?? (unmeasured && initialWindow ? initialWindow : windowDimensions);
 
   return useMemo<UseResponsiveReturn>(() => {
     const isLandscape = width > height;

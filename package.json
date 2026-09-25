@@ -7,6 +7,7 @@
   "files": [
     "src",
     "lib",
+    "testing",
     "!**/__tests__",
     "!**/*.test.ts",
     "!**/*.test.tsx"
@@ -87,6 +88,16 @@
         "default": "./lib/commonjs/index.js"
       }
     },
+    "./testing": {
+      "import": {
+        "types": "./lib/typescript/module/testing.d.ts",
+        "default": "./lib/module/testing.js"
+      },
+      "require": {
+        "types": "./lib/typescript/commonjs/testing.d.ts",
+        "default": "./lib/commonjs/testing.js"
+      }
+    },
     "./package.json": "./package.json"
   },
   "sideEffects": false,
@@ -108,5 +119,12 @@
       ],
       "typescript"
     ]
+  },
+  "typesVersions": {
+    "*": {
+      "testing": [
+        "./lib/typescript/commonjs/testing.d.ts"
+      ]
+    }
   }
 }

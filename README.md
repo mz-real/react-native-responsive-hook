@@ -205,6 +205,26 @@ function Card() {
 
 It is fully typed: style values are checked against React Native's style types, with no casts needed.
 
+### Testing and previews: `MockWindowProvider`
+
+`react-native-responsive-hook/testing` exports a provider that makes every `useResponsive()` and `createResponsiveStyles` hook below it see a window size you choose — for Jest tests, Storybook stories or previews. It doesn't depend on mocking `useWindowDimensions`, which newer React Native versions make difficult.
+
+```tsx
+import { render } from '@testing-library/react-native';
+import { MockWindowProvider } from 'react-native-responsive-hook/testing';
+
+it('shows two columns on a tablet', () => {
+  render(
+    <MockWindowProvider width={1024} height={768}>
+      <Dashboard />
+    </MockWindowProvider>
+  );
+  // ...
+});
+```
+
+`fontScale` is optional (defaults to 1). It composes with `ResponsiveProvider`, which still supplies the config.
+
 ### Platform & orientation
 
 `isIOS`, `isAndroid`, `isLandscape`, `isPortrait`, and `isTablet` — true when the shorter edge of the **window** is at least 600dp (Android's `sw600dp` convention), so it doesn't flip on rotation. It follows the window, not the physical screen: it can change in iPad Split View or Android multi-window, and on the web it is true for any browser window at least 600dp on its shorter side.

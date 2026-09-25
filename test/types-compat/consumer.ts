@@ -39,4 +39,9 @@ const config: ResponsiveConfig = { breakpoints: { md: 640 } };
 // @ts-expect-error -- unknown breakpoint name
 const badConfig: ResponsiveConfig = { breakpoints: { huge: 2000 } };
 
-export { useResponsive, ResponsiveProvider, config, badConfig };
+import { MockWindowProvider, type MockWindowProviderProps } from 'react-native-responsive-hook/testing';
+const mockProps: MockWindowProviderProps = { width: 1024, height: 768 };
+// @ts-expect-error -- width is required
+const badMockProps: MockWindowProviderProps = { height: 768 };
+
+export { useResponsive, ResponsiveProvider, config, badConfig, MockWindowProvider, mockProps, badMockProps };
