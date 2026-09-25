@@ -84,6 +84,19 @@ describe('orientation', () => {
   });
 });
 
+describe('isTablet', () => {
+  it.each([
+    [375, 812, false],
+    [599, 960, false],
+    [600, 960, true],
+    [1024, 768, true],
+    [812, 375, false],
+  ])('%ix%i -> %p (shorter edge >= 600dp)', (width, height, expected) => {
+    setScreen(width, height);
+    expect(renderHook().current.isTablet).toBe(expected);
+  });
+});
+
 describe('breakpoint', () => {
   it('exposes the named breakpoint', () => {
     setScreen(768, 1024);
