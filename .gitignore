@@ -7,3 +7,4 @@ lib/
 # Local design notes, not published
 docs/superpowers/
 coverage/
+test/types-compat/package-lock.json

@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // React Native 0.80+ strict TypeScript API.
+    "customConditions": ["react-native-strict-api"]
+  }
+}

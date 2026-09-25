@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
     "build": "bob build",
     "prepare": "bob build",
-    "lint:package": "publint && attw --pack ."
+    "lint:package": "publint && attw --pack .",
+    "test:types-compat": "rm -f react-native-responsive-hook-*.tgz && npm pack --silent >/dev/null && cd test/types-compat && npm install --no-audit --no-fund --ignore-scripts && npm install --no-save --no-audit --no-fund --ignore-scripts ../../react-native-responsive-hook-*.tgz && tsc -p tsconfig.json && tsc -p tsconfig.strict.json"
   },
   "repository": {
     "type": "git",
