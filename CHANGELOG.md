@@ -4,6 +4,11 @@ All notable changes to this package. Versions follow [Semantic Versioning](https
 
 ## [Unreleased]
 
+## [1.6.3] - 2026-09-25
+
+### Docs
+- The README links to the updated Medium article with a clearer description, and the demo GIF is sharper. No code changes.
+
 ## [1.6.2] - 2026-09-25
 
 ### Docs
@@ -139,7 +144,8 @@ A hotfix for the 1.0.x line. The API is unchanged.
 ### Package
 - The Expo example apps are no longer published with the package, which takes it from 33 files and 802 kB down to 8 files and 25.7 kB.
 
-[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.6.2...HEAD
+[Unreleased]: https://github.com/mz-real/react-native-responsive-hook/compare/v1.6.3...HEAD
+[1.6.3]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.3
 [1.6.2]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.2
 [1.6.1]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.1
 [1.6.0]: https://github.com/mz-real/react-native-responsive-hook/releases/tag/v1.6.0
