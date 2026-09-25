@@ -1,29 +1,51 @@
-# React Native Responsive Hook: Streamline Your UI Across All Devices 🚀
+# react-native-responsive-hook
 
-#### Keen on shaping the future of responsive UI? Your contributions are invaluable! Reach out at zakriamuhammad3637@gmail.com.
-
-## Contents
-- [The Package](#react-native-responsive-hook)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API](#api)
-- [Migrating from 1.0.x](#migrating-from-10x)
-- [Contribute](#want-to-contribute)
-
-## react-native-responsive-hook
+**Responsive layouts for React Native that update on rotation** — named breakpoints, a mobile-first `select()`, accessible font scaling, `wp`/`hp` percentages and size-matters-style `s`/`vs`/`ms`/`mvs` scaling, all from one hook.
 
 [![npm version](https://img.shields.io/npm/v/react-native-responsive-hook.svg)](https://www.npmjs.com/package/react-native-responsive-hook)
 [![npm downloads](https://img.shields.io/npm/dm/react-native-responsive-hook.svg)](https://www.npmjs.com/package/react-native-responsive-hook)
 [![CI](https://github.com/mz-real/react-native-responsive-hook/actions/workflows/ci.yml/badge.svg)](https://github.com/mz-real/react-native-responsive-hook/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/react-native-responsive-hook.svg)](LICENSE)
 
-**react-native-responsive-hook** is an intuitive library offering a suite of hooks that make crafting responsive UIs in React Native effortless. It builds upon react-native-responsive-screen, adding custom hooks and enhanced functionalities for precise breakpoint detection and scalable component design.
+```tsx
+import { createResponsiveStyles } from 'react-native-responsive-hook';
 
-Experience streamlined development and consistent UI across devices. Learn more in [this detailed Medium article](https://medium.com/@mz-real/creating-responsive-uis-in-react-native-made-easy-with-react-native-responsive-hook-35fa5649cd5f)! 🚀
+const useStyles = createResponsiveStyles(({ wp, select, fontSize }) => ({
+  card: { width: wp(90), padding: select({ xs: 12, md: 24, default: 12 }) },
+  title: { fontSize: fontSize(18) }, // respects the OS text-size setting
+}));
 
-Written in TypeScript, shipped as both ESM and CommonJS, with generated type definitions.
+function Card() {
+  const styles = useStyles(); // recomputed on rotation, stable otherwise
+  // ...
+}
+```
+
+## Why this one?
+
+| | react-native-responsive-hook | react-native-size-matters | react-native-responsive-screen |
+|---|:-:|:-:|:-:|
+| Updates on rotation / window resize | ✅ hook-based | ❌ computed once | ⚠️ manual listeners |
+| Named breakpoints + mobile-first `select()` | ✅ | ❌ | ❌ |
+| Respects OS font size (accessibility) | ✅ `fontSize()` | ❌ | ❌ |
+| `wp` / `hp` percentages | ✅ | ❌ | ✅ |
+| `s` / `vs` / `ms` / `mvs` scaling | ✅ | ✅ | ❌ |
+| Configurable base device & breakpoints | ✅ `ResponsiveProvider` | ⚠️ build-time env | ❌ |
+| TypeScript source, ESM + CJS | ✅ | types only | types only |
+| Tablet detection | ✅ `isTablet` | ❌ | ❌ |
+
+Pure JavaScript — no native code, works in Expo Go, on the New Architecture and with react-native-web. Written in TypeScript, 100% test coverage, published with [npm provenance](https://docs.npmjs.com/generating-provenance-statements).
 
 **Requires** React 16.8+ and React Native 0.61+ (the hook depends on `useWindowDimensions`).
+
+Background reading: [Creating responsive UIs in React Native made easy](https://medium.com/@mz-real/creating-responsive-uis-in-react-native-made-easy-with-react-native-responsive-hook-35fa5649cd5f).
+
+## Contents
+- [Installation](#installation)
+- [Usage](#usage)
+- [API](#api)
+- [Migrating from 1.0.x](#migrating-from-10x)
+- [Contribute](#want-to-contribute)
 
 ## Installation
 
@@ -34,8 +56,6 @@ yarn add react-native-responsive-hook
 # or, in an Expo project
 npx expo install react-native-responsive-hook
 ```
-
-Pure JavaScript: no native code, no linking, works in Expo Go and with the New Architecture.
 
 ## Usage
 
@@ -229,7 +249,7 @@ import { ResponsiveProvider } from 'react-native-responsive-hook';
 
 ## Want to Contribute?
 
-Your contributions are welcome! Feel free to submit pull requests or contact me directly to discuss how you can get involved.
+Your contributions are welcome! Feel free to submit pull requests or reach out at zakriamuhammad3637@gmail.com to discuss how you can get involved.
 
 ```bash
 npm install
