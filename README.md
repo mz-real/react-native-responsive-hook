@@ -40,6 +40,14 @@ Pure JavaScript — no native code, works in Expo Go, on the New Architecture an
 
 Background reading: [Creating responsive UIs in React Native made easy](https://medium.com/@mz-real/creating-responsive-uis-in-react-native-made-easy-with-react-native-responsive-hook-35fa5649cd5f).
 
+## Example app
+
+[`example/`](example) is an Expo app built from this repo: a live breakpoint / window-size bar, a card grid whose column count follows `select()`, and a type-scale sample. Rotate the device or resize the browser window to watch it update.
+
+```bash
+npm install && cd example && npm install && npx expo start
+```
+
 ## Contents
 - [Installation](#installation)
 - [Usage](#usage)
