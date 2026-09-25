@@ -163,6 +163,9 @@ export function ResponsiveProvider({
         return DEFAULT_CONFIG;
       }
     },
+    // Deliberately keyed on the primitive values rather than `config`
+    // itself, so an inline object literal does not re-resolve every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [
       baseDevice?.width,
       baseDevice?.height,

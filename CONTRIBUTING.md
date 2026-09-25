@@ -12,6 +12,7 @@ npm install        # also builds lib/ via the prepare script
 ## Before opening a pull request
 
 ```bash
+npm run lint           # ESLint (typescript-eslint, React Hooks rules)
 npm test               # Jest; 100% coverage is enforced with --coverage
 npm run typecheck      # src, tests and type-level assertions
 npm run build          # react-native-builder-bob: ESM, CommonJS, .d.ts
