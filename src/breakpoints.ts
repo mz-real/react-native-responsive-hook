@@ -24,6 +24,14 @@ export const LEGACY_GROUP_BY_BREAKPOINT: Record<Breakpoint, string> = {
 
 export type BreakpointMap<T> = Partial<Record<Breakpoint, T>> & { default?: T };
 
+/** Mobile-first value picker. With a `default` key a value is always found,
+ *  so the result is `T`; without one it may be `undefined`. For mixed value
+ *  types pass the union explicitly: `select<number | 'auto'>({ ... })`. */
+export type Select = {
+  <T>(map: Partial<Record<Breakpoint, T>> & { default: T }): T;
+  <T>(map: BreakpointMap<T>): T | undefined;
+};
+
 /**
  * Resolves a width in dp to its named breakpoint: the largest breakpoint
  * whose threshold the width reaches.
@@ -61,7 +69,7 @@ export function resolveBreakpoint(
  * Presence is tested against `undefined`, not truthiness, so `0` and `''`
  * are returned rather than skipped.
  */
-export function createSelect(current: Breakpoint) {
+export function createSelect(current: Breakpoint): Select {
   const currentIndex = BREAKPOINT_ORDER.indexOf(current);
 
   return function select<T>(map: BreakpointMap<T>): T | undefined {

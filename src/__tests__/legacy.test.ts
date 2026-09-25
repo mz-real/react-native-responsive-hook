@@ -53,6 +53,20 @@ describe('deprecated dimension helpers', () => {
     expect(loadWith(812, 375).remUnit(16)).toBe(16);
   });
 
+  it('accepts percentage strings and defaults size arguments to 0', () => {
+    const pkg = loadWith(375, 812);
+    expect(pkg.widthPercentageToDP('50%')).toBe(187.5);
+    expect(pkg.heightPercentageToDP('50%')).toBe(406);
+    expect(pkg.viewportWidthPercentage('33%')).toBe(123);
+    expect(pkg.viewportHeightPercentage('33%')).toBe(267);
+    expect(pkg.remUnit()).toBe(0);
+    expect(pkg.responsiveFont()).toBe(0);
+  });
+
+  it('applies the 0.9 remUnit multiplier on short screens', () => {
+    expect(loadWith(320, 568).remUnit(16)).toBe(12);
+  });
+
   it('keeps responsiveFont as a flat clamp', () => {
     const pkg = loadWith(375, 812);
     expect(pkg.responsiveFont(64)).toBe(32);
@@ -106,6 +120,24 @@ describe('orientation listener lifecycle', () => {
     // Simulate the pre-0.65 API, which returned nothing from addEventListener.
     expect(() => pkg.removeOrientationListener()).not.toThrow();
     expect(rn.__state.listeners).toHaveLength(0);
+  });
+
+  it('replaces rather than leaks a listener when called twice', () => {
+    const pkg = loadWith(375, 812);
+    pkg.listenOrientationChange({ setState: () => {} });
+    pkg.listenOrientationChange({ setState: () => {} });
+    expect(rn.__state.listeners).toHaveLength(1);
+
+    pkg.removeOrientationListener();
+    expect(rn.__state.listeners).toHaveLength(0);
+  });
+
+  it('keeps remUnit consistent with the new size after a change', () => {
+    const pkg = loadWith(375, 812);
+    pkg.listenOrientationChange({ setState: () => {} });
+    rn.__state.listeners[0].handler({ window: { width: 320, height: 568 } });
+    // floor(320 / 375 * 16 * 0.9)
+    expect(pkg.remUnit(16)).toBe(12);
   });
 
   it('updates orientation state when dimensions change', () => {
