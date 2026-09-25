@@ -25,6 +25,8 @@ npm run lint:package   # publint + are-the-types-wrong on the packed tarball
 
 ## Releases
 
+Add user-facing changes to the `[Unreleased]` section of `CHANGELOG.md` in the same pull request.
+
 Maintainers publish from GitHub Actions with npm trusted publishing (no tokens):
 
 ```bash
