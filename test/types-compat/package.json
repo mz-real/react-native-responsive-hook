@@ -1,0 +1,11 @@
+{
+  "name": "types-compat",
+  "private": true,
+  "description": "Type-checks the packed library the way an app on a recent React Native would consume it.",
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "react": "19.3.0",
+    "react-native": "0.81.6",
+    "typescript": "5.9.3"
+  }
+}
